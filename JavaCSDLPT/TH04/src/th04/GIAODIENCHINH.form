@@ -26,18 +26,24 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane1" max="32767" attributes="0"/>
-                  <Group type="102" attributes="0">
-                      <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="FILE" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="txtLF" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnMANH1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="txtSP" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="291" max="32767" attributes="0"/>
+                      <Component id="btnMANH2" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="btnSANPHAM" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="jScrollPane2" alignment="1" max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                          <Component id="jScrollPane2" alignment="0" max="32767" attributes="0"/>
+                          <Component id="jScrollPane1" alignment="0" max="32767" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="32767" attributes="0"/>
+                  </Group>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -46,39 +52,48 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtLF" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtSP" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="FILE" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnMANH1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnMANH2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnSANPHAM" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="jScrollPane1" min="-2" pref="165" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jScrollPane2" min="-2" pref="184" max="-2" attributes="0"/>
-              <EmptySpace pref="32" max="32767" attributes="0"/>
+              <Component id="jScrollPane1" min="-2" pref="278" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jScrollPane2" min="-2" pref="130" max="-2" attributes="0"/>
+              <EmptySpace pref="19" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JLabel" name="jLabel1">
+    <Component class="javax.swing.JLabel" name="FILE">
       <Properties>
         <Property name="text" type="java.lang.String" value="FILE"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JButton" name="txtLF">
+    <Component class="javax.swing.JButton" name="btnMANH1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="LOAD FILE"/>
+        <Property name="text" type="java.lang.String" value="MANH 1"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtLFActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMANH1ActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="txtSP">
+    <Component class="javax.swing.JButton" name="btnMANH2">
       <Properties>
-        <Property name="text" type="java.lang.String" value="SAN PHAM"/>
+        <Property name="text" type="java.lang.String" value="MANH 2"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtSPActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMANH2ActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnSANPHAM">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="SANPHAM"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSANPHAMActionPerformed"/>
       </Events>
     </Component>
     <Container class="javax.swing.JScrollPane" name="jScrollPane1">

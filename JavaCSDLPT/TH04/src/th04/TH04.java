@@ -1,16 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
-package th03;
 
-/**
- *
- * @author SV
- */
-public class TH03 {
+package th04;
 
-    /**
+public class TH04 {
+
+   /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
@@ -44,5 +37,4 @@ public class TH03 {
             }
         });
     }
-    
 }
