@@ -20,88 +20,133 @@ import javax.swing.table.DefaultTableModel;
 import org.json.JSONArray;
 
 import org.json.JSONException;
+
 public class DataModel {
-    public ArrayList<ArrayList<String>> get ( String url )
-        throws IOException, InterruptedException, JSONException
-    {
+
+    public ArrayList<ArrayList<String>> get(String url)
+            throws IOException, InterruptedException, JSONException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        JSONArray ja =new JSONArray(new String(response.body().getBytes(),"utf-8"));
-        
+        JSONArray ja = new JSONArray(new String(response.body().getBytes(), "utf-8"));
+
         ArrayList<ArrayList<String>> datalist = new ArrayList<>();
-        for(int i=0; i<ja.length(); i++){
+        for (int i = 0; i < ja.length(); i++) {
             String s = ja.get(i).toString();
-            s=s.substring(1,s.length()-1);
-            String []as = s.split(",");
+            s = s.substring(1, s.length() - 1);
+            String[] as = s.split(",");
             ArrayList<String> row = new ArrayList<>();
-            for(int j=0;j<as.length;j++){
-                as[j]=as[j].replace('"', ' ');
+            for (int j = 0; j < as.length; j++) {
+                as[j] = as[j].replace('"', ' ');
                 row.add(as[j]);
             }
             datalist.add(row);
-        }        
+        }
         return datalist;
     }
-    
-    public DefaultTableModel getTableModel(String[] tenCot, ArrayList<ArrayList<String>> d){
+
+    public DefaultTableModel getTableModel(String[] tenCot, ArrayList<ArrayList<String>> d) {
         DefaultTableModel tableModel = new DefaultTableModel(tenCot, 0);
-        for(int i=0;i<d.size();i++){
-            Object o[] =new Object[tenCot.length];
-            for(int j=0;j<d.get(i).size();j++){
+        for (int i = 0; i < d.size(); i++) {
+            Object o[] = new Object[tenCot.length];
+            for (int j = 0; j < d.get(i).size(); j++) {
                 o[j] = d.get(i).get(j);
             }
-            tableModel.addRow(o); 
+            tableModel.addRow(o);
         }
         return tableModel;
     }
-    
-    public DefaultTableModel addTableModel(DefaultTableModel tableModel, ArrayList<ArrayList<String>> d,String tenCot[]){
-        if(tableModel==null){
+
+    public DefaultTableModel addTableModel(DefaultTableModel tableModel, ArrayList<ArrayList<String>> d, String tenCot[]) {
+        if (tableModel == null) {
             tableModel = new DefaultTableModel(tenCot, 0);
         }
-        for(int i=0;i<d.size();i++){
-            Object o[] =new Object[tenCot.length];
-            for(int j=0;j<d.get(i).size();j++){
+        for (int i = 0; i < d.size(); i++) {
+            Object o[] = new Object[tenCot.length];
+            for (int j = 0; j < d.get(i).size(); j++) {
                 o[j] = d.get(i).get(j);
             }
-            tableModel.addRow(o); 
+            tableModel.addRow(o);
         }
         return tableModel;
     }
 
-    public void getDataSanPham(File f, DefaultTableModel tableModel,JTable tblResult,JTextArea txtError, String tenCot[]){
-        if( f == null ){ return; }
+    public void getDataNhanVien(File f, DefaultTableModel tableModel, JTable tblResult, JTextArea txtError, String tenCot[]) {
+        if (f == null) {
+            return;
+        }
         ArrayList<String> aIP = new ArrayList();
-        try{
+        try {
             BufferedReader bf = new BufferedReader(new FileReader(f));
-            while( bf.ready() ){
-                aIP.add( bf.readLine() );
+            while (bf.ready()) {
+                aIP.add(bf.readLine());
             }
             bf.close();
-        }catch(Exception e){
-             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        for(int i=0; i < aIP.size(); i++){
-            String url="http://" + aIP.get(i);
-            DataModel db = new DataModel();            
-            try{
+        for (int i = 0; i < aIP.size(); i++) {
+            String url = "http://" + aIP.get(i);
+            DataModel db = new DataModel();
+            try {
                 ArrayList<ArrayList<String>> a = db.get(url);
-                DefaultTableModel b = db.addTableModel(tableModel, a,tenCot);
+                DefaultTableModel b = db.addTableModel(tableModel, a, tenCot);
                 tblResult.setModel(b);
                 break;
-            }
-            catch(ConnectException e1){
+            } catch (ConnectException e1) {
                 String s = txtError.getText();
-                s+="\n";
-                s+=url+" Down";
+                s += "\n";
+                s += url + " Down";
                 txtError.setText(s);
 
-            }
-            catch(Exception e2){
+            } catch (Exception e2) {
                 e2.printStackTrace();
             }
         }
     }
-    
+
+    public void postToFile(File f, JTextArea txtError, Map<String, String> params, String endpoint) {
+        if (f == null) {
+            return;
+        }
+        ArrayList<String> aIP = new ArrayList<>();
+
+        try (BufferedReader bf = new BufferedReader(new FileReader(f))) {
+            while (bf.ready()) {
+                aIP.add(bf.readLine());
+            }
+        } catch (Exception e) {
+            txtError.append("\nLỗi đọc file IP: " + e.getMessage());
+            return;
+        }
+
+        for (String ip : aIP) {
+            try {
+                String url = "http://" + ip + "/" + endpoint;
+                HttpClient client = HttpClient.newHttpClient();
+
+                // tạo nội dung gửi đi dạng form-data
+                StringBuilder formData = new StringBuilder();
+                for (Map.Entry<String, String> entry : params.entrySet()) {
+                    if (formData.length() > 0) {
+                        formData.append("&");
+                    }
+                    formData.append(entry.getKey()).append("=").append(entry.getValue());
+                }
+
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(url))
+                        .header("Content-Type", "application/x-www-form-urlencoded")
+                        .POST(HttpRequest.BodyPublishers.ofString(formData.toString()))
+                        .build();
+
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                txtError.append("\nPOST tới " + url + ": " + response.body());
+//
+            } catch (Exception e) {
+                txtError.append("\nLỗi POST tới " + ip + ": " + e.getMessage());
+            }
+        }
+    }
+
 }
