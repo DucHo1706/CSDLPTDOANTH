@@ -1,2 +1,12 @@
+# Visual Studio cache & build
+.vs/
+[Bb]in/
+[Dd]ebug/
+[Rr]elease/
+obj/
+*.suo
+*.user
+
+# Java / NetBeans
 /JavaCSDLPT/TH03/build/
 /JavaCSDLPT/TH03/nbproject/private/

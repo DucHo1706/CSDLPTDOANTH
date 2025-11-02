@@ -3,7 +3,7 @@ using System.Web.Mvc;
 
 namespace CSDLPTTH01.Controllers
 {
-    public class HomeController : Controller
+    public class HoaDonController : Controller
     {
         DataModel db = new DataModel();
         public JsonResult Index()
