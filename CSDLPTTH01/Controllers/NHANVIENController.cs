@@ -7,10 +7,9 @@ namespace CSDLPTTH01.Controllers
     {
         DataModel db = new DataModel();
 
-        // Lấy danh sách nhân viên
         public JsonResult Index()
         {
-            string sql = "SELECT * FROM NHANVIEN";
+            string sql = "SELECT maNV, hoten, maCN FROM NHANVIEN";
             return Json(db.get(sql), JsonRequestBehavior.AllowGet);
         }
 
