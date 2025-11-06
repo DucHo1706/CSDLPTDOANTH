@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Data.SqlClient;
 using System.Collections;
+using System.Data;
 
 namespace CSDLPTTH01.Models
 {
@@ -11,45 +12,70 @@ namespace CSDLPTTH01.Models
     {
         public static string connectionString = "Server=Duckr5;Database=QL_DienLuc;User Id=sa; Password=123; Encrypt=False;TrustServerCertificate=True;MultipleActiveResultSets=True";
 
-        public ArrayList get(String sql)
+        /**
+         * Hàm get (SELECT) đã được cập nhật
+         * - Sửa lỗi: Trả về một List<List<object>> (Array của Arrays)
+         * - Không còn trả về tên cột
+         */
+        public List<List<object>> get(string sql, SqlParameter[] parameters = null)
         {
-            ArrayList datalist = new ArrayList();
-            SqlConnection connection = new SqlConnection(connectionString);
-            SqlCommand command = new SqlCommand(sql, connection);
-            connection.Open();
-            using (SqlDataReader r = command.ExecuteReader())
+            // Thay đổi 1: Kiểu trả về là List<List<object>>
+            var dataList = new List<List<object>>();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlCommand command = new SqlCommand(sql, connection))
             {
-                while (r.Read())
+                if (parameters != null)
                 {
-                    ArrayList row = new ArrayList();
-                    for (int i = 0; i < r.FieldCount; i++)
+                    command.Parameters.AddRange(parameters);
+                }
+
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
                     {
-                        row.Add(xulydulieu(r.GetValue(i).ToString()));
+                        // Thay đổi 2: 'row' bây giờ là một List<object> (mảng giá trị)
+                        var row = new List<object>();
+                        for (int i = 0; i < reader.FieldCount; i++)
+                        {
+                            var value = reader.GetValue(i);
+
+                            // Tự động cắt khoảng trắng nếu là string
+                            if (value is string)
+                            {
+                                // Thay đổi 3: Chỉ thêm giá trị vào mảng, không thêm key
+                                row.Add(((string)value).TrimEnd());
+                            }
+                            else
+                            {
+                                // Thay đổi 3 (tiếp): Chỉ thêm giá trị
+                                row.Add(value);
+                            }
+                        }
+                        dataList.Add(row); // Thêm mảng giá trị vào kết quả
                     }
-                    datalist.Add(row);
                 }
             }
-            connection.Close();
-            return datalist;
+            return dataList;
         }
-        public string xulydulieu(string text)
-        {
-            String s = text.Replace(",", "&44;");
-            s = s.Replace("\"", "&34;");
-            s = s.Replace("'", "&39;");
-            s = s.Replace("\r", "");
-            s = s.Replace("\n", "");
-            return s;
-        }
-        public void exec(string sql)
+
+        /**
+         * Hàm exec (INSERT, UPDATE, DELETE) an toàn
+         */
+        public void exec(string sql, SqlParameter[] parameters)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlCommand command = new SqlCommand(sql, connection))
             {
-                SqlCommand command = new SqlCommand(sql, connection);
+                if (parameters != null)
+                {
+                    command.Parameters.AddRange(parameters);
+                }
+
                 connection.Open();
                 command.ExecuteNonQuery();
             }
         }
-
     }
 }
