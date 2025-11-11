@@ -2,21 +2,26 @@ package csdlpt;
 
 // Import
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.JTextArea;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
-// Thêm các import cho giao diện mới
-import javax.swing.JSplitPane;
-import javax.swing.JPanel;
-import javax.swing.GroupLayout;
-import javax.swing.LayoutStyle;
-import javax.swing.BorderFactory;
 
 /**
  * Giao diện (JPanel) CHỈ DÀNH CHO TAB HÓA ĐƠN
@@ -29,12 +34,21 @@ public class HoaDon extends javax.swing.JPanel {
     private File ipFile;
     private JTextArea txtLogOutput;
 
+    // Colors for modern UI
+    private final Color PRIMARY_COLOR = new Color(41, 128, 185);
+    private final Color SECONDARY_COLOR = new Color(52, 152, 219);
+    private final Color BACKGROUND_COLOR = new Color(245, 245, 245);
+    private final Color PANEL_BACKGROUND = Color.WHITE;
+    private final Color BORDER_COLOR = new Color(189, 195, 199);
+    private final Color DISABLED_BACKGROUND = new Color(240, 240, 240);
+
     /**
      * Creates new form HoaDonPanel
      */
     public HoaDon() {
         initComponents(); 
-        addTableListeners(); 
+        addTableListeners();
+        applyModernStyling();
     }
 
     /**
@@ -44,7 +58,6 @@ public class HoaDon extends javax.swing.JPanel {
         this.dataModel = model;
         this.ipFile = file;
         this.txtLogOutput = log;
-      //  btnLoadHOADONActionPerformed(null);
     }
     
     /**
@@ -69,18 +82,106 @@ public class HoaDon extends javax.swing.JPanel {
         });
     }
 
-    /**
-     * HÀM GIAO DIỆN (Đã Viết Lại)
-     */
+    private void applyModernStyling() {
+        // Set background
+        setBackground(BACKGROUND_COLOR);
+        panelForm.setBackground(PANEL_BACKGROUND);
+        panelButtons.setBackground(PANEL_BACKGROUND);
+        jScrollPane1.getViewport().setBackground(Color.WHITE);
+
+        // Style labels
+        Font labelFont = new Font("Segoe UI", Font.BOLD, 13);
+        jLabel1.setFont(labelFont);
+        jLabel2.setFont(labelFont);
+        jLabel3.setFont(labelFont);
+        jLabel4.setFont(labelFont);
+        jLabel5.setFont(labelFont);
+        jLabel6.setFont(labelFont);
+        
+        jLabel1.setForeground(new Color(44, 62, 80));
+        jLabel2.setForeground(new Color(44, 62, 80));
+        jLabel3.setForeground(new Color(44, 62, 80));
+        jLabel4.setForeground(new Color(44, 62, 80));
+        jLabel5.setForeground(new Color(44, 62, 80));
+        jLabel6.setForeground(new Color(44, 62, 80));
+
+        // Style text fields
+        Font textFieldFont = new Font("Segoe UI", Font.PLAIN, 13);
+        Border textFieldBorder = BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(BORDER_COLOR, 1),
+            BorderFactory.createEmptyBorder(5, 8, 5, 8)
+        );
+        
+        txtSoHDN.setFont(textFieldFont);
+        txtThang.setFont(textFieldFont);
+        txtNam.setFont(textFieldFont);
+        txtSoHD_HOADON.setFont(textFieldFont);
+        txtMaNV_HOADON.setFont(textFieldFont);
+        txtSoTien.setFont(textFieldFont);
+        
+        txtSoHDN.setBorder(textFieldBorder);
+        txtThang.setBorder(textFieldBorder);
+        txtNam.setBorder(textFieldBorder);
+        txtSoHD_HOADON.setBorder(textFieldBorder);
+        txtMaNV_HOADON.setBorder(textFieldBorder);
+        txtSoTien.setBorder(textFieldBorder);
+
+        // Style disabled field
+        txtSoHDN.setBackground(DISABLED_BACKGROUND);
+        txtSoHDN.setForeground(new Color(100, 100, 100));
+
+        // Style buttons
+        styleButton(btnLoadHOADON, new Color(52, 152, 219)); // Blue
+        styleButton(btnAddHOADON, new Color(39, 174, 96));   // Green
+        styleButton(btnUpdateHOADON, new Color(243, 156, 18)); // Orange
+        styleButton(btnDeleteHOADON, new Color(231, 76, 60)); // Red
+
+        // Style table
+        tblHoaDon.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        tblHoaDon.setRowHeight(25);
+        tblHoaDon.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        tblHoaDon.getTableHeader().setBackground(new Color(52, 73, 94));
+        tblHoaDon.getTableHeader().setForeground(Color.WHITE);
+        tblHoaDon.setShowGrid(true);
+        tblHoaDon.setGridColor(new Color(236, 240, 241));
+
+        // Style scroll pane
+        jScrollPane1.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(BORDER_COLOR, 1),
+            BorderFactory.createEmptyBorder(0, 0, 0, 0)
+        ));
+
+        // Style split pane
+        jSplitPane1.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        jSplitPane1.setBackground(BACKGROUND_COLOR);
+    }
+
+    private void styleButton(JButton button, Color color) {
+        button.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setBackground(color);
+        button.setForeground(Color.WHITE);
+        button.setPreferredSize(new Dimension(90, 35));
+        
+        // Hover effects
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(color.darker());
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(color);
+            }
+        });
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        // --- KHAI BÁO BIẾN GIAO DIỆN ---
         jSplitPane1 = new javax.swing.JSplitPane();
         panelForm = new javax.swing.JPanel();
         panelButtons = new javax.swing.JPanel();
-        
         jScrollPane1 = new javax.swing.JScrollPane();
         tblHoaDon = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
@@ -100,25 +201,22 @@ public class HoaDon extends javax.swing.JPanel {
         btnUpdateHOADON = new javax.swing.JButton();
         btnDeleteHOADON = new javax.swing.JButton();
 
-        // --- CẤU HÌNH PANEL CHÍNH (HoaDon.java) ---
         setLayout(new java.awt.BorderLayout());
 
-        // --- CẤU HÌNH PANEL BÊN PHẢI (Bảng) ---
-        tblHoaDon.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
+        jSplitPane1.setDividerSize(8);
+        jSplitPane1.setResizeWeight(0.35);
 
-            },
-            new String [] {
-                "Số HĐN", "Tháng", "Năm", "Số HĐ", "Mã NV", "Số Tiền"
-            }
+        panelForm.setBorder(javax.swing.BorderFactory.createTitledBorder(
+            javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5), 
+            "THÔNG TIN HÓA ĐƠN", 
+            javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, 
+            javax.swing.border.TitledBorder.DEFAULT_POSITION, 
+            new java.awt.Font("Segoe UI", Font.BOLD, 14), 
+            new java.awt.Color(41, 128, 185)
         ));
-        jScrollPane1.setViewportView(tblHoaDon);
 
-        // --- CẤU HÌNH PANEL BÊN TRÁI (Form Nhập liệu) ---
-        panelForm.setBorder(BorderFactory.createTitledBorder("Thông tin Hóa Đơn"));
-        
         jLabel1.setText("Số HĐN (Auto):");
-        txtSoHDN.setEditable(false); // Khóa trường tự tăng
+        txtSoHDN.setEditable(false);
         txtSoHDN.setFocusable(false);
         
         jLabel2.setText("Tháng:");
@@ -127,9 +225,8 @@ public class HoaDon extends javax.swing.JPanel {
         jLabel5.setText("Mã NV (Lập HĐ):");
         jLabel6.setText("Số Tiền:");
 
-        // Cấu hình panel chứa các nút
-        panelButtons.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 5, 5));
-        
+        panelButtons.setLayout(new java.awt.GridLayout(1, 4, 10, 0));
+
         btnLoadHOADON.setText("Tải Lại");
         btnLoadHOADON.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -162,75 +259,96 @@ public class HoaDon extends javax.swing.JPanel {
         });
         panelButtons.add(btnDeleteHOADON);
 
-        // --- Sắp xếp layout cho panelForm (Dùng GroupLayout) ---
-        GroupLayout panelFormLayout = new GroupLayout(panelForm);
+        javax.swing.GroupLayout panelFormLayout = new javax.swing.GroupLayout(panelForm);
         panelForm.setLayout(panelFormLayout);
-        panelFormLayout.setAutoCreateGaps(true);
-        panelFormLayout.setAutoCreateContainerGaps(true);
-
         panelFormLayout.setHorizontalGroup(
-            panelFormLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelFormLayout.createSequentialGroup()
-                .addGroup(panelFormLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel6))
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelFormLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(txtSoHDN)
-                    .addComponent(txtThang)
-                    .addComponent(txtNam)
-                    .addComponent(txtSoHD_HOADON)
-                    .addComponent(txtMaNV_HOADON)
-                    .addComponent(txtSoTien)))
-            .addComponent(panelButtons, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
+                .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(panelButtons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(panelFormLayout.createSequentialGroup()
+                        .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel6))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtSoHDN)
+                            .addComponent(txtThang)
+                            .addComponent(txtNam)
+                            .addComponent(txtSoHD_HOADON)
+                            .addComponent(txtMaNV_HOADON)
+                            .addComponent(txtSoTien))))
+                .addContainerGap())
         );
-
         panelFormLayout.setVerticalGroup(
-            panelFormLayout.createSequentialGroup()
-                .addGroup(panelFormLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+            panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelFormLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(txtSoHDN, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelFormLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtSoHDN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(txtThang, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelFormLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtThang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(txtNam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelFormLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtNam, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(txtSoHD_HOADON, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelFormLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtSoHD_HOADON, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(txtMaNV_HOADON, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelFormLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtMaNV_HOADON, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
-                    .addComponent(txtSoTien, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(panelButtons, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtSoTien, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(30, 30, 30)
+                .addComponent(panelButtons, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        // --- CẤU HÌNH THANH CHIA (JSplitPane) ---
         jSplitPane1.setLeftComponent(panelForm);
+
+        tblHoaDon.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Số HĐN", "Tháng", "Năm", "Số HĐ", "Mã NV", "Số Tiền"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(tblHoaDon);
+
         jSplitPane1.setRightComponent(jScrollPane1);
-        jSplitPane1.setDividerLocation(380); // Cần rộng hơn
-        jSplitPane1.setOneTouchExpandable(true);
 
         add(jSplitPane1, java.awt.BorderLayout.CENTER);
-        
     }// </editor-fold>//GEN-END:initComponents
 
-    // === CÁC HÀM SỰ KIỆN (Đã Sửa) ===
-    
     private void btnLoadHOADONActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadHOADONActionPerformed
         String endpoint = "/HOADON/Index";
         txtLogOutput.setText("Đang tải dữ liệu Hóa Đơn từ tất cả các site...\n");
@@ -383,10 +501,10 @@ public class HoaDon extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JPanel panelForm; // Đã đổi tên
-    private javax.swing.JPanel panelButtons; // Panel mới
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSplitPane jSplitPane1; // Thanh chia
+    private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JPanel panelButtons;
+    private javax.swing.JPanel panelForm;
     private javax.swing.JTable tblHoaDon;
     private javax.swing.JTextField txtMaNV_HOADON;
     private javax.swing.JTextField txtNam;
