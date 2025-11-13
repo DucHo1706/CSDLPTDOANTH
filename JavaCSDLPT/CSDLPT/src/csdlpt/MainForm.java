@@ -1,199 +1,147 @@
 package csdlpt;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
 import java.io.File;
-import javax.swing.BorderFactory;
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
+import javax.swing.*;
+import javax.swing.border.*;
 
 /**
- * Cửa sổ chính (JFrame), chứa 5 Tab (JPanel)
+ * Màn hình chính của hệ thống Quản lý Điện Lực Phân Tán
+ * Gồm 5 tab chính: Chi Nhánh, Nhân Viên, Khách Hàng, Hợp Đồng, Hóa Đơn
  *
  * @author duc18
  */
-public class MainForm extends javax.swing.JFrame {
+public class MainForm extends JFrame {
 
-    // === 1. BIẾN LOGIC ===
     private DataModel dataModel;
     private File ipFile;
 
-    // === 2. BIẾN GIAO DIỆN ===
-    // ĐÃ XÓA KHAI BÁO TRÙNG jTabbedPane1 và txtLogOutput Ở ĐÂY
-    // Vì chúng đã được khai báo trong phần Generated Code
+    private ChiNhanh tabChiNhanh;
+    private NhanVien tabNhanVien;
+    private KhachHang tabKhachHang;
+    private HopDong tabHopDong;
+    private HoaDon tabHoaDon;
 
-    // 5 Panel tương ứng 5 Tab
-    private NhanVien panelNhanVien;
-    private ChiNhanh panelChiNhanh;
-    private KhachHang panelKhachHang;
-    private HopDong panelHopDong;
-    private HoaDon panelHoaDon;
+    private JTabbedPane tabbedPane;
+    private JTextArea logArea;
+    private JScrollPane logScrollPane;
 
-    // Colors for modern UI
-    private final Color PRIMARY_COLOR = new Color(41, 128, 185);
-    private final Color SECONDARY_COLOR = new Color(52, 152, 219);
-    private final Color BACKGROUND_COLOR = new Color(245, 245, 245);
-    private final Color LOG_BACKGROUND = new Color(30, 30, 30);
-    private final Color LOG_FOREGROUND = new Color(0, 255, 0);
 
-    /**
-     * Creates new form MainForm
-     */
+    private static final Color COLOR_PRIMARY = new Color(41, 128, 185);
+    private static final Color COLOR_BACKGROUND = new Color(245, 245, 245);
+    private static final Color COLOR_LOG_BG = new Color(0,0,0);
+    private static final Color COLOR_LOG_TEXT = new Color(255, 255,255);
+
+
     public MainForm() {
+        setLookAndFeel();
+
+        // Khởi tạo logic
+        dataModel = new DataModel();
+        ipFile = new File("D:\\Netbean\\CSDLPTDOANTH\\IP.txt"); // ⚠️ Cập nhật đường dẫn IP nếu cần
+
+        // Khởi tạo giao diện
+        initUI();
+        applyModernUI();
+
+        // Gán logic cho từng tab
+        initTabsWithLogic();
+
+        // Kiểm tra file IP
+        showStartupStatus();
+    }
+
+    private void initUI() {
+        setTitle(" PHÂN TÁN ");
+        setLayout(new BorderLayout());
+        setSize(1200, 800);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+        // --- Tabs ---
+        tabbedPane = new JTabbedPane();
+        tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 13));
+
+        // Khởi tạo 5 panel
+        tabChiNhanh = new ChiNhanh();
+        tabNhanVien = new NhanVien();
+        tabKhachHang = new KhachHang();
+        tabHopDong = new HopDong();
+        tabHoaDon = new HoaDon();
+
+        // Thêm panel vào Tab
+        tabbedPane.addTab(" Chi Nhánh", tabChiNhanh);
+        tabbedPane.addTab(" Nhân Viên", tabNhanVien);
+        tabbedPane.addTab(" Khách Hàng", tabKhachHang);
+        tabbedPane.addTab(" Hợp Đồng", tabHopDong);
+        tabbedPane.addTab(" Hóa Đơn", tabHoaDon);
+        add(tabbedPane, BorderLayout.CENTER);
+
+        // --- Log ---
+        logArea = new JTextArea(10, 20);
+        logArea.setEditable(false);
+        logArea.setFont(new Font("Consolas", Font.PLAIN, 13));
+        logArea.setLineWrap(true);
+        logArea.setWrapStyleWord(true);
+
+        logScrollPane = new JScrollPane(logArea);
+        add(logScrollPane, BorderLayout.SOUTH);
+    }
+
+    private void applyModernUI() {
+        getContentPane().setBackground(COLOR_BACKGROUND);
+
+        // Log area style
+        logArea.setBackground(COLOR_LOG_BG);
+        logArea.setForeground(COLOR_LOG_TEXT);
+        logArea.setCaretColor(Color.WHITE);
+
+        logScrollPane.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(new Color(100, 100, 100), 1),
+                " LOG",
+                TitledBorder.LEFT, TitledBorder.TOP,
+                new Font("Segoe UI", Font.BOLD, 12),
+                new Color(200, 200, 200)
+        ));
+        logScrollPane.setPreferredSize(new Dimension(0, 200));
+    }
+
+    private void initTabsWithLogic() {
+        tabChiNhanh.init(dataModel, ipFile, logArea);
+        tabNhanVien.init(dataModel, ipFile, logArea);
+        tabKhachHang.init(dataModel, ipFile, logArea);
+        tabHopDong.init(dataModel, ipFile, logArea);
+        tabHoaDon.init(dataModel, ipFile, logArea);
+    }
+
+
+    private void showStartupStatus() {
+        if (!ipFile.exists()) {
+            log(" Không tìm thấy file cấu hình IP.txt tại: " + ipFile.getAbsolutePath());
+            log(" Vui lòng kiểm tra lại đường dẫn file IP!");
+        } else {
+            log(" HỆ THỐNG ĐÃ SẴN SÀNG");
+            log("File IP: " + ipFile.getAbsolutePath());
+            log(" Vui lòng chọn tab và tải dữ liệu để bắt đầu...");
+        }
+    }
+
+
+    private void log(String message) {
+        logArea.append(message + "\n");
+    }
+
+
+    private void setLookAndFeel() {
         try {
-            // Sửa lỗi: Thay thế getSystemLookAndFeel() bằng getSystemLookAndFeelClassName()
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        // Khởi tạo logic trước
-        dataModel = new DataModel();
-
-        // !!! QUAN TRỌNG: Sửa đường dẫn này cho đúng !!!
-        ipFile = new File("E:\\CSDLPT_DOAN(LT)\\IP.txt");
-
-        // Khởi tạo giao diện (Hàm do NetBeans tạo)
-        initComponents();
-
-        // Áp dụng styling hiện đại
-        applyModernStyling();
-
-        // "Bơm" logic vào các Panel
-        panelChiNhanh.init(dataModel, ipFile, txtLogOutput);
-        panelNhanVien.init(dataModel, ipFile, txtLogOutput);
-        panelKhachHang.init(dataModel, ipFile, txtLogOutput);
-        panelHopDong.init(dataModel, ipFile, txtLogOutput);
-        panelHoaDon.init(dataModel, ipFile, txtLogOutput);
-
-        // Cấu hình cửa sổ
-        setTitle("QUẢN LÝ ĐIỆN LỰC PHÂN TÁN - HỆ THỐNG DISTRIBUTED DATABASE");
-        setSize(1200, 800); // Tăng kích thước cho phù hợp
-        setLocationRelativeTo(null); // Giữa màn hình
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        if (!ipFile.exists()) {
-            txtLogOutput.setText("🚨 LỖI: Không tìm thấy file IP.txt tại: " + ipFile.getAbsolutePath() + "\n");
-            txtLogOutput.append("🔍 Vui lòng kiểm tra đường dẫn file cấu hình IP!\n");
-        } else {
-            txtLogOutput.setText("✅ HỆ THỐNG ĐÃ SẴN SÀNG\n");
-            txtLogOutput.append("📁 File IP: " + ipFile.getAbsolutePath() + "\n");
-            txtLogOutput.append("👆 Vui lòng chọn Tab và tải dữ liệu để bắt đầu...\n");
-        }
     }
 
-    private void applyModernStyling() {
-        // Set background
-        getContentPane().setBackground(BACKGROUND_COLOR);
-        
-        // Style the tabbed pane
-        jTabbedPane1.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        jTabbedPane1.setBackground(BACKGROUND_COLOR);
-        
-        // Style the log output area (Terminal-like appearance)
-        txtLogOutput.setFont(new Font("Consolas", Font.PLAIN, 13));
-        txtLogOutput.setBackground(LOG_BACKGROUND);
-        txtLogOutput.setForeground(new Color(50, 255, 50)); // Green terminal text
-        txtLogOutput.setCaretColor(Color.WHITE);
-        txtLogOutput.setEditable(false);
-        txtLogOutput.setLineWrap(true);
-        txtLogOutput.setWrapStyleWord(true);
-        
-        // Style the scroll pane for log
-        JScrollPane logScrollPane = (JScrollPane) txtLogOutput.getParent().getParent();
-        logScrollPane.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(new Color(100, 100, 100), 1),
-            "📊 LOG HỆ THỐNG - HOẠT ĐỘNG CƠ SỞ DỮ LIỆU PHÂN TÁN",
-            TitledBorder.LEFT,
-            TitledBorder.TOP,
-            new Font("Segoe UI", Font.BOLD, 12),
-            new Color(200, 200, 200)
-        ));
-        
-        // Set preferred size for log area
-        logScrollPane.setPreferredSize(new Dimension(0, 200)); // Height 200 pixels
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new MainForm().setVisible(true));
     }
-
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
-
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jScrollPane_Log = new javax.swing.JScrollPane();
-        txtLogOutput = new javax.swing.JTextArea();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setBackground(new java.awt.Color(255, 255, 255));
-        setMinimumSize(new java.awt.Dimension(1000, 700));
-        setPreferredSize(new java.awt.Dimension(1200, 800));
-
-        // === TẠO 5 PANEL VỚI ICONS ===
-        panelChiNhanh = new ChiNhanh();
-        panelNhanVien = new NhanVien();
-        panelKhachHang = new KhachHang();
-        panelHopDong = new HopDong();
-        panelHoaDon = new HoaDon();
-
-        // === THÊM 5 PANEL VÀO TAB VỚI TÊN HIỆN ĐẠI ===
-        jTabbedPane1.addTab("🏢 Chi Nhánh", panelChiNhanh);
-        jTabbedPane1.addTab("👨‍💼 Nhân Viên", panelNhanVien);
-        jTabbedPane1.addTab("👥 Khách Hàng", panelKhachHang);
-        jTabbedPane1.addTab("📄 Hợp Đồng", panelHopDong);
-        jTabbedPane1.addTab("🧾 Hóa Đơn", panelHoaDon);
-
-        // Đặt JTabbedPane vào giữa
-        getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
-
-        // === CẤU HÌNH TEXT AREA CHO LOG ===
-        txtLogOutput.setColumns(20);
-        txtLogOutput.setRows(10); // Tăng số dòng hiển thị
-        txtLogOutput.setBorder(new EmptyBorder(10, 10, 10, 10));
-        jScrollPane_Log.setViewportView(txtLogOutput);
-
-        // Thêm scroll pane vào phía dưới
-        getContentPane().add(jScrollPane_Log, java.awt.BorderLayout.SOUTH);
-
-        pack();
-    }// </editor-fold>//GEN-END:initComponents
-
-    /**
-     * Main method - entry point of the application
-     */
-    public static void main(String args[]) {
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-
-        // Create and display the form
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainForm().setVisible(true);
-            }
-        });
-    }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane_Log;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTextArea txtLogOutput;
-    // End of variables declaration//GEN-END:variables
 }

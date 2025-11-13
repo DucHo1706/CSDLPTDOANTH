@@ -1,25 +1,17 @@
 package csdlpt;
 
-// Import
-import java.awt.BorderLayout;
+// Import (Giữ nguyên)
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridLayout;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -29,12 +21,12 @@ import javax.swing.event.ListSelectionListener;
  */
 public class HoaDon extends javax.swing.JPanel {
 
-    // === 1. BIẾN LOGIC ===
+    // === 1. BIẾN LOGIC === (Giữ nguyên)
     private DataModel dataModel;
     private File ipFile;
     private JTextArea txtLogOutput;
 
-    // Colors for modern UI
+    // Colors for modern UI (Giữ nguyên)
     private final Color PRIMARY_COLOR = new Color(41, 128, 185);
     private final Color SECONDARY_COLOR = new Color(52, 152, 219);
     private final Color BACKGROUND_COLOR = new Color(245, 245, 245);
@@ -58,6 +50,9 @@ public class HoaDon extends javax.swing.JPanel {
         this.dataModel = model;
         this.ipFile = file;
         this.txtLogOutput = log;
+        
+       dataModel.loadComboBoxData(cmbSoHD_HOADON, txtLogOutput, "/HOPDONG/Index");
+       dataModel.loadComboBoxData(cmbMaNV_HOADON, txtLogOutput, "/NHANVIEN/Index");
     }
     
     /**
@@ -71,10 +66,12 @@ public class HoaDon extends javax.swing.JPanel {
                     txtSoHDN.setText(tblHoaDon.getValueAt(row, 0).toString());
                     txtThang.setText(tblHoaDon.getValueAt(row, 1).toString());
                     txtNam.setText(tblHoaDon.getValueAt(row, 2).toString());
-                    txtSoHD_HOADON.setText(tblHoaDon.getValueAt(row, 3).toString());
-                    txtMaNV_HOADON.setText(tblHoaDon.getValueAt(row, 4).toString());
                     
-                    // Cẩn thận với giá trị tiền/null
+                    // === SỬA: Đặt giá trị cho ComboBox ===
+                    // (Giả sử ComboBox lưu String)
+                    cmbSoHD_HOADON.setSelectedItem(tblHoaDon.getValueAt(row, 3).toString());
+                    cmbMaNV_HOADON.setSelectedItem(tblHoaDon.getValueAt(row, 4).toString());
+                    
                     Object soTien = tblHoaDon.getValueAt(row, 5);
                     txtSoTien.setText(soTien == null ? "" : soTien.toString());
                 }
@@ -82,14 +79,14 @@ public class HoaDon extends javax.swing.JPanel {
         });
     }
 
+    // (Hàm applyModernStyling giữ nguyên, không cần sửa)
     private void applyModernStyling() {
-        // Set background
+        // ... (Giữ nguyên code) ...
         setBackground(BACKGROUND_COLOR);
         panelForm.setBackground(PANEL_BACKGROUND);
         panelButtons.setBackground(PANEL_BACKGROUND);
         jScrollPane1.getViewport().setBackground(Color.WHITE);
 
-        // Style labels
         Font labelFont = new Font("Segoe UI", Font.BOLD, 13);
         jLabel1.setFont(labelFont);
         jLabel2.setFont(labelFont);
@@ -105,7 +102,6 @@ public class HoaDon extends javax.swing.JPanel {
         jLabel5.setForeground(new Color(44, 62, 80));
         jLabel6.setForeground(new Color(44, 62, 80));
 
-        // Style text fields
         Font textFieldFont = new Font("Segoe UI", Font.PLAIN, 13);
         Border textFieldBorder = BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(BORDER_COLOR, 1),
@@ -115,48 +111,45 @@ public class HoaDon extends javax.swing.JPanel {
         txtSoHDN.setFont(textFieldFont);
         txtThang.setFont(textFieldFont);
         txtNam.setFont(textFieldFont);
-        txtSoHD_HOADON.setFont(textFieldFont);
-        txtMaNV_HOADON.setFont(textFieldFont);
+        // cmbSoHD_HOADON.setFont(textFieldFont); // Style cho ComboBox
+        // cmbMaNV_HOADON.setFont(textFieldFont); // Style cho ComboBox
         txtSoTien.setFont(textFieldFont);
         
         txtSoHDN.setBorder(textFieldBorder);
         txtThang.setBorder(textFieldBorder);
         txtNam.setBorder(textFieldBorder);
-        txtSoHD_HOADON.setBorder(textFieldBorder);
-        txtMaNV_HOADON.setBorder(textFieldBorder);
+        // cmbSoHD_HOADON.setBorder(textFieldBorder);
+        // cmbMaNV_HOADON.setBorder(textFieldBorder);
         txtSoTien.setBorder(textFieldBorder);
 
-        // Style disabled field
         txtSoHDN.setBackground(DISABLED_BACKGROUND);
         txtSoHDN.setForeground(new Color(100, 100, 100));
 
-        // Style buttons
-        styleButton(btnLoadHOADON, new Color(52, 152, 219)); // Blue
-        styleButton(btnAddHOADON, new Color(39, 174, 96));   // Green
-        styleButton(btnUpdateHOADON, new Color(243, 156, 18)); // Orange
-        styleButton(btnDeleteHOADON, new Color(231, 76, 60)); // Red
+        styleButton(btnLoadHOADON, new Color(52, 152, 219)); 
+        styleButton(btnAddHOADON, new Color(39, 174, 96));   
+        styleButton(btnUpdateHOADON, new Color(243, 156, 18)); 
+        styleButton(btnDeleteHOADON, new Color(231, 76, 60)); 
 
-        // Style table
         tblHoaDon.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         tblHoaDon.setRowHeight(25);
         tblHoaDon.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         tblHoaDon.getTableHeader().setBackground(new Color(52, 73, 94));
-        tblHoaDon.getTableHeader().setForeground(Color.WHITE);
+        tblHoaDon.getTableHeader().setForeground(Color.BLACK);
         tblHoaDon.setShowGrid(true);
         tblHoaDon.setGridColor(new Color(236, 240, 241));
 
-        // Style scroll pane
         jScrollPane1.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(BORDER_COLOR, 1),
             BorderFactory.createEmptyBorder(0, 0, 0, 0)
         ));
 
-        // Style split pane
         jSplitPane1.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         jSplitPane1.setBackground(BACKGROUND_COLOR);
     }
-
+    
+    // (Hàm styleButton giữ nguyên, không cần sửa)
     private void styleButton(JButton button, Color color) {
+        // ... (Giữ nguyên code) ...
         button.setFont(new Font("Segoe UI", Font.BOLD, 12));
         button.setFocusPainted(false);
         button.setBorderPainted(false);
@@ -164,7 +157,6 @@ public class HoaDon extends javax.swing.JPanel {
         button.setForeground(Color.WHITE);
         button.setPreferredSize(new Dimension(90, 35));
         
-        // Hover effects
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(color.darker());
@@ -175,6 +167,7 @@ public class HoaDon extends javax.swing.JPanel {
         });
     }
 
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -191,15 +184,18 @@ public class HoaDon extends javax.swing.JPanel {
         jLabel3 = new javax.swing.JLabel();
         txtNam = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        txtSoHD_HOADON = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        txtMaNV_HOADON = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         txtSoTien = new javax.swing.JTextField();
         btnLoadHOADON = new javax.swing.JButton();
         btnAddHOADON = new javax.swing.JButton();
         btnUpdateHOADON = new javax.swing.JButton();
         btnDeleteHOADON = new javax.swing.JButton();
+        
+        // === SỬA: Khởi tạo 2 ComboBox ===
+        // (Bạn phải làm điều này trong Design View)
+        cmbSoHD_HOADON = new javax.swing.JComboBox<>();
+        cmbMaNV_HOADON = new javax.swing.JComboBox<>();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -259,6 +255,7 @@ public class HoaDon extends javax.swing.JPanel {
         });
         panelButtons.add(btnDeleteHOADON);
 
+        // === SỬA: Bố cục Layout để chứa ComboBox ===
         javax.swing.GroupLayout panelFormLayout = new javax.swing.GroupLayout(panelForm);
         panelForm.setLayout(panelFormLayout);
         panelFormLayout.setHorizontalGroup(
@@ -280,8 +277,8 @@ public class HoaDon extends javax.swing.JPanel {
                             .addComponent(txtSoHDN)
                             .addComponent(txtThang)
                             .addComponent(txtNam)
-                            .addComponent(txtSoHD_HOADON)
-                            .addComponent(txtMaNV_HOADON)
+                            .addComponent(cmbSoHD_HOADON, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE) // Sửa
+                            .addComponent(cmbMaNV_HOADON, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE) // Sửa
                             .addComponent(txtSoTien))))
                 .addContainerGap())
         );
@@ -303,11 +300,11 @@ public class HoaDon extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(txtSoHD_HOADON, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cmbSoHD_HOADON, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)) // Sửa
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(txtMaNV_HOADON, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cmbMaNV_HOADON, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)) // Sửa
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
@@ -316,6 +313,7 @@ public class HoaDon extends javax.swing.JPanel {
                 .addComponent(panelButtons, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+        // === HẾT SỬA BỐ CỤC ===
 
         jSplitPane1.setLeftComponent(panelForm);
 
@@ -349,32 +347,47 @@ public class HoaDon extends javax.swing.JPanel {
         add(jSplitPane1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
+    // (Hàm btnLoadHOADONActionPerformed giữ nguyên, không cần sửa)
     private void btnLoadHOADONActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadHOADONActionPerformed
         String endpoint = "/HOADON/Index";
         txtLogOutput.setText("Đang tải dữ liệu Hóa Đơn từ tất cả các site...\n");
         
         new Thread(() -> {
             setAllButtonsEnabled(false);
-            dataModel.getDataFromAllSites(ipFile, tblHoaDon, txtLogOutput, endpoint);
+            dataModel.fetchAllSitesData(ipFile, tblHoaDon, txtLogOutput, endpoint);
             javax.swing.SwingUtilities.invokeLater(() -> {
                 setAllButtonsEnabled(true);
             });
         }).start();
     }//GEN-LAST:event_btnLoadHOADONActionPerformed
 
+    
+    // === SỬA HÀM ADD ===
     private void btnAddHOADONActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddHOADONActionPerformed
         String endpoint = "/HOADON/Add";
         
         Map<String, String> params = new HashMap<>();
-        // Không gửi soHDN vì nó là IDENTITY (tự tăng)
+        // Không gửi soHDN (SP sẽ tự tạo)
         params.put("thang", txtThang.getText());
         params.put("nam", txtNam.getText());
-        params.put("soHD", txtSoHD_HOADON.getText());
-        params.put("maNV", txtMaNV_HOADON.getText());
+        
+        // Lấy dữ liệu từ ComboBox
+        String soHD = "";
+        if (cmbSoHD_HOADON.getSelectedItem() != null) {
+            soHD = cmbSoHD_HOADON.getSelectedItem().toString();
+        }
+        
+        String maNV = "";
+        if (cmbMaNV_HOADON.getSelectedItem() != null) {
+            maNV = cmbMaNV_HOADON.getSelectedItem().toString();
+        }
+        
+        params.put("soHD", soHD);
+        params.put("maNV", maNV);
         params.put("soTien", txtSoTien.getText());
 
         if (params.get("soHD").isEmpty() || params.get("maNV").isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Số HĐ và Mã NV không được trống.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn Hợp Đồng và Nhân Viên.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -382,6 +395,7 @@ public class HoaDon extends javax.swing.JPanel {
         
         new Thread(() -> {
             setAllButtonsEnabled(false);
+            // Gọi API (API sẽ gọi sp_TaoHoaDonTuDong)
             boolean isSuccess = dataModel.postToMaster(txtLogOutput, params, endpoint);
             
             if(isSuccess) {
@@ -397,15 +411,29 @@ public class HoaDon extends javax.swing.JPanel {
         }).start();
     }//GEN-LAST:event_btnAddHOADONActionPerformed
 
+    
+    // === SỬA HÀM UPDATE ===
     private void btnUpdateHOADONActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateHOADONActionPerformed
         String endpoint = "/HOADON/Update";
         
         Map<String, String> params = new HashMap<>();
-        params.put("soHDN", txtSoHDN.getText()); // Khóa chính để Update
+        params.put("soHDN", txtSoHDN.getText()); // Khóa chính (string)
         params.put("thang", txtThang.getText());
         params.put("nam", txtNam.getText());
-        params.put("soHD", txtSoHD_HOADON.getText());
-        params.put("maNV", txtMaNV_HOADON.getText());
+
+        // Lấy dữ liệu từ ComboBox
+        String soHD = "";
+        if (cmbSoHD_HOADON.getSelectedItem() != null) {
+            soHD = cmbSoHD_HOADON.getSelectedItem().toString();
+        }
+        
+        String maNV = "";
+        if (cmbMaNV_HOADON.getSelectedItem() != null) {
+            maNV = cmbMaNV_HOADON.getSelectedItem().toString();
+        }
+
+        params.put("soHD", soHD);
+        params.put("maNV", maNV);
         params.put("soTien", txtSoTien.getText());
 
         if (params.get("soHDN").isEmpty()) {
@@ -432,11 +460,13 @@ public class HoaDon extends javax.swing.JPanel {
         }).start();
     }//GEN-LAST:event_btnUpdateHOADONActionPerformed
 
+    
+    // === SỬA HÀM DELETE ===
     private void btnDeleteHOADONActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteHOADONActionPerformed
         String endpoint = "/HOADON/Delete";
         
         Map<String, String> params = new HashMap<>();
-        params.put("soHDN", txtSoHDN.getText());
+        params.put("soHDN", txtSoHDN.getText()); // Khóa chính (string)
 
         if (params.get("soHDN").isEmpty()) {
             JOptionPane.showMessageDialog(this, "Bạn phải chọn một Hóa Đơn (Số HĐN) để xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -471,10 +501,9 @@ public class HoaDon extends javax.swing.JPanel {
         }).start();
     }//GEN-LAST:event_btnDeleteHOADONActionPerformed
 
-    /**
-     * Hàm tiện ích để bật/tắt tất cả các nút (chạy trên luồng giao diện)
-     */
+    // (Hàm setAllButtonsEnabled giữ nguyên)
     private void setAllButtonsEnabled(boolean enabled) {
+        // ... (Giữ nguyên code) ...
         if (javax.swing.SwingUtilities.isEventDispatchThread()) {
             btnLoadHOADON.setEnabled(enabled);
             btnAddHOADON.setEnabled(enabled);
@@ -506,11 +535,13 @@ public class HoaDon extends javax.swing.JPanel {
     private javax.swing.JPanel panelButtons;
     private javax.swing.JPanel panelForm;
     private javax.swing.JTable tblHoaDon;
-    private javax.swing.JTextField txtMaNV_HOADON;
     private javax.swing.JTextField txtNam;
     private javax.swing.JTextField txtSoHDN;
-    private javax.swing.JTextField txtSoHD_HOADON;
     private javax.swing.JTextField txtSoTien;
     private javax.swing.JTextField txtThang;
+    
+    // === SỬA: Khai báo 2 ComboBox ===
+    private javax.swing.JComboBox<String> cmbMaNV_HOADON;
+    private javax.swing.JComboBox<String> cmbSoHD_HOADON;
     // End of variables declaration//GEN-END:variables
 }

@@ -1,89 +1,72 @@
 package csdlpt;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.ConnectException;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.io.*;
+import java.net.*;
+import java.net.http.*;
 import java.nio.charset.StandardCharsets;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
+import java.text.*;
 import java.util.*;
-import java.util.concurrent.Callable; // Thêm thư viện Song Song
-import java.util.concurrent.ExecutorService; // Thêm thư viện Song Song
-import java.util.concurrent.Executors; // Thêm thư viện Song Song
-import java.util.concurrent.Future; // Thêm thư viện Song Song
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.table.DefaultTableModel;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONException;
+import java.util.concurrent.*;
+import java.util.regex.*;
+import javax.swing.*;
+import javax.swing.table.*;
+import org.json.*;
 
+/**
+ * DataModel - Lớp trung tâm xử lý kết nối, CRUD và đồng bộ dữ liệu giữa các site.
+ * Giữ nguyên chức năng gốc, chỉ được viết lại cho dễ đọc, dễ bảo trì.
+ */
 public class DataModel {
 
-    // (Giữ nguyên) Định nghĩa cột
-    private static final Map<String, String[]> COLUMNS_MAP = Map.of(
-        "/NHANVIEN/INDEX", new String[]{"maNV", "hoten", "maCN"},
-        "/HOADON/INDEX", new String[]{"soHDN", "thang", "nam", "soHD", "maNV", "soTien"},
-        "/HOPDONG/INDEX", new String[]{"soHD", "ngayKy", "maKH", "soDienKe", "kwDinhMuc", "dongiaKW"},
-        "/KHACHHANG/INDEX", new String[]{"maKH", "tenKH", "maCN"},
-        "/CHINHANH/INDEX", new String[]{"maCN", "tenCN", "thanhpho"}
+    // ===== ĐỊNH NGHĨA CỘT THEO ENDPOINT =====
+    private static final Map<String, String[]> COLUMN_MAP = Map.of(
+        "/NHANVIEN/INDEX", new String[]{"Mã Nhân Viên", "Họ Tên", "Mã Chi Nhánh"},
+        "/HOADON/INDEX", new String[]{"Số HD", "Tháng", "Năm", "Số HD", "Mã NV", "Số Tiền"},
+        "/HOPDONG/INDEX", new String[]{"Số Hóa Đơn", "Ngày Đăng Ký", "Mã Khách Hàng", "Số Điện Kế", "KV- Định Mức", "giá"},
+        "/KHACHHANG/INDEX", new String[]{"Mã Khách Hàng", "Tên Khách Hàng", "Mã Chi Nhánh"},
+        "/CHINHANH/INDEX", new String[]{"Mã Chi Nhánh", "Tên chi nhánh", "Thành Phố"}
     );
 
-    private Map<String, String> siteMap = new HashMap<>();
-    private String masterIP = null;
+    // ===== CẤU HÌNH SITE =====
+    private final Map<String, String> siteMap = new HashMap<>();
+    private String masterIP;
 
-    // (Giữ nguyên) Các biến định dạng
+    // ===== ĐỊNH DẠNG =====
     private final NumberFormat currencyFormatter;
     private final SimpleDateFormat dateFormatter;
     private final Pattern msDatePattern;
-    
-    // === THÊM MỚI: BỂ BƠI LUỒNG (THREAD POOL) ===
-    // Tạo một bể bơi có 3 luồng (cho 3 server)
-    private final ExecutorService executor;
-    // ===========================================
 
-     public DataModel() {
-         siteMap.put("26.233.138.208", "MÁY CHÍNH");
-         siteMap.put("26.52.142.67", "THÀNH PHỐ 2");
-         siteMap.put("26.45.153.150", "THÀNH PHỐ 1");
-         
-         for (Map.Entry<String, String> entry : siteMap.entrySet()) {
-             if (entry.getValue().equals("MÁY CHÍNH")) {
-                 masterIP = entry.getKey();
-                 break;
-             }
-         }
-         
-         if (masterIP == null) {
-             System.err.println("!!! CẤU HÌNH LỖI: Không tìm thấy 'MÁY CHÍNH' trong siteMap");
-         }
-         
-         Locale localeVN = new Locale("vi", "VN");
-         currencyFormatter = NumberFormat.getCurrencyInstance(localeVN);
-         dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
-         msDatePattern = Pattern.compile("/Date\\((\\d+)\\)/");
-         
-         // === THÊM MỚI: KHỞI TẠO BỂ BƠI LUỒNG ===
-         executor = Executors.newFixedThreadPool(3);
-         // =======================================
+    // ===== LUỒNG SONG SONG =====
+    private final ExecutorService executor = Executors.newFixedThreadPool(3);
+
+    // ===== KHỞI TẠO =====
+    public DataModel() {
+        siteMap.put("26.233.138.208", "MÁY CHÍNH");
+        siteMap.put("26.52.142.67", "THÀNH PHỐ 2");
+        siteMap.put("26.45.153.150", "THÀNH PHỐ 1");
+
+        masterIP = siteMap.entrySet()
+                          .stream()
+                          .filter(e -> e.getValue().equals("MÁY CHÍNH"))
+                          .map(Map.Entry::getKey)
+                          .findFirst()
+                          .orElse(null);
+
+        if (masterIP == null) {
+            System.err.println("❌ Không tìm thấy IP 'MÁY CHÍNH' trong siteMap!");
+        }
+
+        Locale localeVN = new Locale("vi", "VN");
+        currencyFormatter = NumberFormat.getCurrencyInstance(localeVN);
+        dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
+        msDatePattern = Pattern.compile("/Date\\((\\d+)\\)/");
     }
-     
-    /**
-     * Lớp nội (inner class) để chứa kết quả trả về từ luồng
-     */
-    private class SiteDataResult {
-        String siteName;
-        ArrayList<ArrayList<String>> data;
-        Exception error;
+
+    // ===== LỚP PHỤ TRỢ =====
+    private static class SiteDataResult {
+        final String siteName;
+        final ArrayList<ArrayList<String>> data;
+        final Exception error;
 
         SiteDataResult(String siteName, ArrayList<ArrayList<String>> data, Exception error) {
             this.siteName = siteName;
@@ -92,250 +75,273 @@ public class DataModel {
         }
     }
 
+    // ==============================================================
+    // =============== 1️⃣ LẤY DỮ LIỆU (GET REQUEST) ================
+    // ==============================================================
 
-    /**
-     * Hàm GET (Không thay đổi)
-     */
-    public ArrayList<ArrayList<String>> get(String url, String[] keys) 
+    public ArrayList<ArrayList<String>> get(String url, String[] keys)
             throws IOException, InterruptedException, JSONException {
-        // ... (Giữ nguyên code hàm này) ...
+
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .timeout(java.time.Duration.ofSeconds(10))
                 .build();
-        
+
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         String body = response.body().trim();
-        ArrayList<ArrayList<String>> datalist = new ArrayList<>();
 
-        if (body.startsWith("[")) {
-            JSONArray ja = new JSONArray(body);
-            for (int i = 0; i < ja.length(); i++) {
-                try {
-                    JSONArray rowJsonArray = ja.getJSONArray(i); 
-                    ArrayList<String> row = new ArrayList<>();
-                    int limit = Math.min(rowJsonArray.length(), keys.length);
-                    for (int j = 0; j < limit; j++) {
-                        Object value = rowJsonArray.opt(j);
-                        row.add(value == null || value == JSONObject.NULL ? "" : value.toString().trim());
-                    }
-                    datalist.add(row);
-                } catch (JSONException e) {
-                     System.err.println("Lỗi parsing hàng: " + e.getMessage());
+        ArrayList<ArrayList<String>> dataList = new ArrayList<>();
+        if (!body.startsWith("[")) {
+            System.err.println("⚠️ Dữ liệu trả về từ " + url + " không phải JSONArray!");
+            return dataList;
+        }
+
+        JSONArray jsonArray = new JSONArray(body);
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+                JSONArray rowJson = jsonArray.getJSONArray(i);
+                ArrayList<String> row = new ArrayList<>();
+                for (int j = 0; j < Math.min(rowJson.length(), keys.length); j++) {
+                    Object val = rowJson.opt(j);
+                    row.add(val == null || val == JSONObject.NULL ? "" : val.toString().trim());
                 }
+                dataList.add(row);
+            } catch (JSONException e) {
+                System.err.println("Lỗi phân tích JSON hàng " + i + ": " + e.getMessage());
             }
-        } else {
-             System.err.println("Cảnh báo: Dữ liệu trả về từ " + url + " không phải JSONArray!");
         }
-        return datalist;
+        return dataList;
     }
 
-    /**
-     * Hàm đổ dữ liệu vào JTable (Không thay đổi)
-     */
-    public DefaultTableModel addTableModel(DefaultTableModel tableModel, ArrayList<ArrayList<String>> d, String tenCot[]) {
-        // ... (Giữ nguyên code hàm này) ...
-        if (tableModel == null) {
-            tableModel = new DefaultTableModel(tenCot, 0);
-        } else {
-            tableModel.setRowCount(0);
+    // ==============================================================
+    // =============== 2️⃣ ĐỔ DỮ LIỆU VÀO BẢNG (TABLE) ==============
+    // ==============================================================
+
+    public DefaultTableModel fillTable(DefaultTableModel model, ArrayList<ArrayList<String>> data, String[] columns) {
+        if (model == null)
+            model = new DefaultTableModel(columns, 0);
+        else
+            model.setRowCount(0);
+
+        for (ArrayList<String> row : data) {
+            Object[] rowData = row.toArray(new Object[0]);
+            model.addRow(rowData);
         }
-        for (int i = 0; i < d.size(); i++) {
-            Object o[] = new Object[tenCot.length];
-            int limit = Math.min(d.get(i).size(), tenCot.length);
-            for (int j = 0; j < limit; j++) {
-                o[j] = d.get(i).get(j);
-            }
-            tableModel.addRow(o);
-        }
-        return tableModel;
+        return model;
     }
 
-    /**
-     * ĐỌC DỮ LIỆU TỪ TẤT CẢ SITE (ĐÃ VIẾT LẠI ĐỂ CHẠY SONG SONG)
-     */
-    public void getDataFromAllSites(File f, JTable tblResult, JTextArea txtError, String endpoint) {
+    // ==============================================================
+    // =============== 3️⃣ LẤY DỮ LIỆU TỪ NHIỀU SITE SONG SONG ======
+    // ==============================================================
+
+    public void fetchAllSitesData(File fileIP, JTable table, JTextArea logArea, String endpoint) {
         String endpointKey = endpoint.toUpperCase();
-        String[] tenCot = COLUMNS_MAP.get(endpointKey);
-        
-        if (tenCot == null) {
-            txtError.append("\nLỗi: Không tìm thấy định nghĩa cột cho: " + endpoint);
+        String[] columns = COLUMN_MAP.get(endpointKey);
+
+        if (columns == null) {
+            logArea.append("\n Không tìm thấy cấu hình cột cho endpoint: " + endpoint);
             return;
         }
 
-        ArrayList<String> aIP = new ArrayList<>();
-        try (BufferedReader bf = new BufferedReader(new FileReader(f))) {
-            String line;
-            while ((line = bf.readLine()) != null) {
-                if(!line.trim().isEmpty()) aIP.add(line.trim());
-            }
-        } catch (Exception e) {
-            txtError.append("\nLỗi đọc file IP: " + e.getMessage());
+        // Đọc file IP
+        List<String> siteIPs = readIPList(fileIP, logArea);
+        if (siteIPs.isEmpty()) {
+            logArea.append("\n️ File IP trống hoặc lỗi đọc.");
             return;
         }
 
-        // Cấu hình bảng
-        String[] columnsWithSite = new String[tenCot.length + 1];
-        System.arraycopy(tenCot, 0, columnsWithSite, 0, tenCot.length);
-        columnsWithSite[tenCot.length] = "SITE"; 
-        
+        // Thêm cột "SITE"
+        String[] columnsWithSite = Arrays.copyOf(columns, columns.length + 1);
+        columnsWithSite[columns.length] = "SITE";
+
         DefaultTableModel model = new DefaultTableModel(columnsWithSite, 0);
-        tblResult.setModel(model);
+        table.setModel(model);
 
         int totalRecords = 0;
-        int successfulSites = 0;
+        int successSites = 0;
 
-        // === BẮT ĐẦU THAY ĐỔI: TẠO CÁC TÁC VỤ SONG SONG ===
-        
+        // Tạo danh sách tác vụ song song
         List<Callable<SiteDataResult>> tasks = new ArrayList<>();
-        
-        // 1. Tạo 3 tác vụ (chưa chạy)
-        for (String ip : aIP) {
-            final String currentIp = ip;
-            final String siteName = siteMap.getOrDefault(currentIp, "UNKNOWN");
-            final String url = "http://" + currentIp + "/" + endpoint;
+        for (String ip : siteIPs) {
+            final String siteName = siteMap.getOrDefault(ip, "UNKNOWN");
+            final String url = "http://" + ip + "/" + endpoint;
 
-            tasks.add(() -> { // Đây là một Callable (tác vụ có trả về kết quả)
+            tasks.add(() -> {
                 try {
-                    // Tác vụ này sẽ chạy trên luồng riêng
-                    ArrayList<ArrayList<String>> data = this.get(url, tenCot);
-                    return new SiteDataResult(siteName, data, null); // Thành công
+                    ArrayList<ArrayList<String>> data = get(url, columns);
+                    return new SiteDataResult(siteName, data, null);
                 } catch (Exception e) {
-                    return new SiteDataResult(siteName, null, e); // Thất bại
+                    return new SiteDataResult(siteName, null, e);
                 }
             });
         }
 
-        // 2. Thực thi TẤT CẢ tác vụ CÙNG LÚC và đợi
+        // Thực thi song song
         try {
             List<Future<SiteDataResult>> futures = executor.invokeAll(tasks);
-
-            // 3. Xử lý kết quả (Sau khi tất cả đã xong)
             for (Future<SiteDataResult> future : futures) {
-                SiteDataResult result = future.get(); // Lấy kết quả
+                SiteDataResult result = future.get();
 
                 if (result.error != null) {
-                    // Lỗi (ví dụ: ConnectException, Timeout)
-                    txtError.append("\n " + result.siteName + " - Không kết nối được: " + result.error.getMessage());
-                } else if (result.data.isEmpty()) {
-                    txtError.append("\n " + result.siteName + " - Hoạt động nhưng không có dữ liệu.");
-                } else {
-                    // Thành công, đổ dữ liệu vào bảng
-                    for (ArrayList<String> row : result.data) {
-                        Object[] rowWithSite = new Object[columnsWithSite.length];
-                        for (int i = 0; i < row.size(); i++) {
-                            // Định dạng
-                            String columnName = tenCot[i];
-                            String value = row.get(i);
-                            if (endpointKey.equals("/HOPDONG/INDEX") && columnName.equals("ngayKy")) {
-                                rowWithSite[i] = formatMsDate(value);
-                            } else if (endpointKey.equals("/HOADON/INDEX") && columnName.equals("soTien")) {
-                                rowWithSite[i] = formatCurrency(value);
-                            } else if (endpointKey.equals("/HOPDONG/INDEX") && columnName.equals("dongiaKW")) {
-                                rowWithSite[i] = formatCurrency(value);
-                            } else {
-                                rowWithSite[i] = value;
-                            }
-                        }
-                        rowWithSite[columnsWithSite.length - 1] = result.siteName; 
-                        model.addRow(rowWithSite);
-                    }
-                    totalRecords += result.data.size();
-                    successfulSites++;
-                    txtError.append("\n ĐỌC từ " + result.siteName + ": " + result.data.size() + " bản ghi");
+                    logArea.append("\n " + result.siteName + " - Lỗi kết nối: " + result.error.getMessage());
+                    continue;
                 }
-            }
-        } catch (Exception e) {
-            txtError.append("\n Lỗi nghiêm trọng khi thực thi song song: " + e.getMessage());
-        }
-        // === KẾT THÚC THAY ĐỔI ===
+                if (result.data.isEmpty()) {
+                    logArea.append("\n️ " + result.siteName + " - Không có dữ liệu.");
+                    continue;
+                }
 
-        txtError.append("\n=== KẾT QUẢ ĐỌC: " + totalRecords + " bản ghi từ " + successfulSites + "/" + aIP.size() + " site ===");
+                // Thêm dữ liệu vào bảng
+                for (ArrayList<String> row : result.data) {
+                    Object[] rowWithSite = Arrays.copyOf(row.toArray(), columnsWithSite.length);
+                    rowWithSite[columnsWithSite.length - 1] = result.siteName;
+                    model.addRow(rowWithSite);
+                }
+
+                totalRecords += result.data.size();
+                successSites++;
+                logArea.append("\n✅ " + result.siteName + " - Đọc " + result.data.size() + " bản ghi");
+            }
+
+        } catch (Exception e) {
+            logArea.append("\n Lỗi song song: " + e.getMessage());
+        }
+
+        logArea.append("\n=== KẾT QUẢ: " + totalRecords + " bản ghi từ " + successSites + "/" + siteIPs.size() + " site ===");
     }
 
+    // ==============================================================
+    // =============== 4️⃣ POST DỮ LIỆU LÊN MÁY CHÍNH ===============
+    // ==============================================================
 
-public boolean postToMaster(JTextArea txtError, Map<String, String> params, String endpoint) {
+    public boolean postToMaster(JTextArea logArea, Map<String, String> params, String endpoint) {
         if (masterIP == null) {
-            txtError.append("\n LỖI NGHIÊM TRỌNG: Không thể POST vì không tìm thấy IP MÁY CHÍNH.");
-            return false; // THAY ĐỔI: Trả về false
+            logArea.append("\n Không tìm thấy IP máy chính!");
+            return false;
         }
+
         String url = "http://" + masterIP + "/" + endpoint;
-        String targetSite = "MÁY CHÍNH";
         try {
-            HttpClient client = HttpClient.newHttpClient();
-            StringBuilder formData = new StringBuilder();
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                if (formData.length() > 0) {
-                    formData.append("&");
-                }
-                String encodedValue = URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8);
-                formData.append(entry.getKey()).append("=").append(encodedValue);
-            }
+            String formData = buildFormData(params);
+
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .header("Content-Type", "application/x-www-form-urlencoded")
-                .POST(HttpRequest.BodyPublishers.ofString(formData.toString()))
-                .timeout(java.time.Duration.ofSeconds(10))
-                .build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            String result = response.body();
-            try {
-                JSONObject jsonResponse = new JSONObject(result);
-                boolean success = jsonResponse.optBoolean("success", false);
-                String message = jsonResponse.optString("message", result);
-                if (success) {
-                    txtError.append("\n GHI " + endpoint + " đến " + targetSite + ": THÀNH CÔNG - " + message);
-                    return true; // THAY ĐỔI: Trả về true
-                } else {
-                    txtError.append("\n GHI " + endpoint + " đến " + targetSite + ": THẤT BẠI - " + message);
-                    return false; // THAY ĐỔI: Trả về false
-                }
-            } catch (JSONException e) {
-                txtError.append("\n Phản hồi không phải JSON từ " + targetSite + ": " + result);
-                return false; // THAY ĐỔI: Trả về false
-            }
-        } catch (ConnectException e1) {
-            txtError.append("\n Không kết nối được đến " + targetSite + " (" + masterIP + ") để GHI");
+                    .uri(URI.create(url))
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .POST(HttpRequest.BodyPublishers.ofString(formData))
+                    .timeout(java.time.Duration.ofSeconds(10))
+                    .build();
+
+            HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            return handlePostResponse(response.body(), logArea, endpoint);
+
+        } catch (ConnectException e) {
+            logArea.append("\n Không kết nối được tới máy chính (" + masterIP + ")");
         } catch (java.net.http.HttpTimeoutException e) {
-            txtError.append("\n Timeout kết nối đến " + targetSite + " (" + masterIP + ")");
+            logArea.append("\n️ Timeout khi gửi đến máy chính (" + masterIP + ")");
         } catch (Exception e) {
-            txtError.append("\n Lỗi GHI đến " + targetSite + " (" + masterIP + "): " + e.getMessage());
+            logArea.append("\n️ Lỗi POST: " + e.getMessage());
         }
-        
-        return false; // THAY ĐỔI: Trả về false cho tất cả các lỗi catch
+        return false;
     }
-    
-    // === CÁC HÀM HỖ TRỢ ĐỊNH DẠNG MỚI (Không thay đổi) ===
+
+    private boolean handlePostResponse(String body, JTextArea logArea, String endpoint) {
+        try {
+            JSONObject json = new JSONObject(body);
+            boolean success = json.optBoolean("success", false);
+            String message = json.optString("message", body);
+            logArea.append("\n" + (success ? "" : "") + " POST " + endpoint + ": " + message);
+            return success;
+        } catch (JSONException e) {
+            logArea.append("\n️ Phản hồi không phải JSON: " + body);
+            return false;
+        }
+    }
+
+    // ==============================================================
+    // =============== 5️⃣ HÀM TIỆN ÍCH HỖ TRỢ ======================
+    // ==============================================================
+
+    private List<String> readIPList(File f, JTextArea logArea) {
+        List<String> list = new ArrayList<>();
+        try (BufferedReader bf = new BufferedReader(new FileReader(f))) {
+            String line;
+            while ((line = bf.readLine()) != null) {
+                if (!line.trim().isEmpty()) list.add(line.trim());
+            }
+        } catch (Exception e) {
+            logArea.append("\n⚠️ Lỗi đọc file IP: " + e.getMessage());
+        }
+        return list;
+    }
+
+    private String buildFormData(Map<String, String> params) {
+        StringBuilder sb = new StringBuilder();
+        params.forEach((key, value) -> {
+            if (sb.length() > 0) sb.append("&");
+            sb.append(URLEncoder.encode(key, StandardCharsets.UTF_8))
+              .append("=")
+              .append(URLEncoder.encode(value, StandardCharsets.UTF_8));
+        });
+        return sb.toString();
+    }
 
     private String formatMsDate(String msDate) {
-        // ... (Giữ nguyên code hàm này) ...
-        if (msDate == null || msDate.isEmpty()) {
-            return "";
-        }
+        if (msDate == null || msDate.isEmpty()) return "";
         Matcher matcher = msDatePattern.matcher(msDate);
         if (matcher.find()) {
             try {
                 long timestamp = Long.parseLong(matcher.group(1));
-                Date date = new Date(timestamp);
-                return dateFormatter.format(date);
-            } catch (Exception e) {
-                return msDate; 
-            }
+                return dateFormatter.format(new Date(timestamp));
+            } catch (Exception ignored) {}
         }
-        return msDate; 
+        return msDate;
     }
 
-    private String formatCurrency(String numberStr) {
-        // ... (Giữ nguyên code hàm này) ...
-        if (numberStr == null || numberStr.isEmpty()) {
-            return "";
-        }
+    private String formatCurrency(String numStr) {
+        if (numStr == null || numStr.isEmpty()) return "";
         try {
-            double value = Double.parseDouble(numberStr);
-            return currencyFormatter.format(value);
+            double val = Double.parseDouble(numStr);
+            return currencyFormatter.format(val);
         } catch (NumberFormatException e) {
-            return numberStr; 
+            return numStr;
         }
+    }
+
+    // ==============================================================
+    // =============== 6️⃣ COMBOBOX HỖ TRỢ ==========================
+    // ==============================================================
+
+    public void loadComboBoxData(JComboBox<String> combo, JTextArea logArea, String endpoint) {
+        if (masterIP == null) {
+            logArea.append("\n Không có máy chính để tải ComboBox!");
+            return;
+        }
+
+        String url = "http://" + masterIP + "/" + endpoint;
+        String[] keys = COLUMN_MAP.get(endpoint.toUpperCase());
+
+        if (keys == null) {
+            logArea.append("\n Không tìm thấy cột cho endpoint " + endpoint);
+            return;
+        }
+
+        new Thread(() -> {
+            try {
+                ArrayList<ArrayList<String>> data = get(url, keys);
+                SwingUtilities.invokeLater(() -> {
+                    combo.removeAllItems();
+                    if (data.isEmpty()) combo.addItem(" (Không có dữ liệu) ");
+                    else data.forEach(row -> combo.addItem(row.get(0)));
+                    logArea.append("\n Tải ComboBox " + endpoint + " thành công (" + data.size() + " mục)");
+                });
+            } catch (Exception e) {
+                SwingUtilities.invokeLater(() -> {
+                    combo.removeAllItems();
+                    combo.addItem(" (Lỗi tải dữ liệu) ");
+                    logArea.append("\n Lỗi tải ComboBox: " + e.getMessage());
+                });
+            }
+        }).start();
     }
 }

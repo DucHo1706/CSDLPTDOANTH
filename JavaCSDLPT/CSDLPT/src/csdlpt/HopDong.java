@@ -1,26 +1,17 @@
 package csdlpt;
 
-// Import
-import java.awt.BorderLayout;
+// Import (Giữ nguyên)
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridLayout;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -30,17 +21,18 @@ import javax.swing.event.ListSelectionListener;
  */
 public class HopDong extends javax.swing.JPanel {
 
-    // === 1. BIẾN LOGIC ===
+    // === 1. BIẾN LOGIC === (Giữ nguyên)
     private DataModel dataModel;
     private File ipFile;
     private JTextArea txtLogOutput;
 
-    // Colors for modern UI
+    // Colors for modern UI (Giữ nguyên)
     private final Color PRIMARY_COLOR = new Color(41, 128, 185);
     private final Color SECONDARY_COLOR = new Color(52, 152, 219);
     private final Color BACKGROUND_COLOR = new Color(245, 245, 245);
     private final Color PANEL_BACKGROUND = Color.WHITE;
     private final Color BORDER_COLOR = new Color(189, 195, 199);
+    private final Color DISABLED_BACKGROUND = new Color(240, 240, 240); // Thêm màu này
 
     /**
      * Creates new form HopDongPanel
@@ -58,6 +50,8 @@ public class HopDong extends javax.swing.JPanel {
         this.dataModel = model;
         this.ipFile = file;
         this.txtLogOutput = log;
+        
+       dataModel.loadComboBoxData(cmbMaKH_HD, txtLogOutput, "/KHACHHANG/Index");
     }
     
     /**
@@ -70,10 +64,13 @@ public class HopDong extends javax.swing.JPanel {
                     int row = tblHopDong.getSelectedRow();
                     txtSoHD.setText(tblHopDong.getValueAt(row, 0).toString());
                     txtNgayKy.setText(tblHopDong.getValueAt(row, 1).toString());
-                    txtMaKH_HD.setText(tblHopDong.getValueAt(row, 2).toString());
+                    
+                    // === SỬA: Đặt giá trị cho ComboBox ===
+                    cmbMaKH_HD.setSelectedItem(tblHopDong.getValueAt(row, 2).toString());
+                    
                     txtSoDienKe.setText(tblHopDong.getValueAt(row, 3).toString());
                     txtKWDinhMuc.setText(tblHopDong.getValueAt(row, 4).toString());
-                    // Cẩn thận với giá trị tiền/null
+                    
                     Object donGia = tblHopDong.getValueAt(row, 5);
                     txtDonGiaKW.setText(donGia == null ? "" : donGia.toString());
                 }
@@ -81,14 +78,14 @@ public class HopDong extends javax.swing.JPanel {
         });
     }
 
+    // (Hàm applyModernStyling giữ nguyên, chỉ sửa 1 dòng)
     private void applyModernStyling() {
-        // Set background
+        // ... (Giữ nguyên code) ...
         setBackground(BACKGROUND_COLOR);
         panelForm.setBackground(PANEL_BACKGROUND);
         panelButtons.setBackground(PANEL_BACKGROUND);
         jScrollPane1.getViewport().setBackground(Color.WHITE);
 
-        // Style labels
         Font labelFont = new Font("Segoe UI", Font.BOLD, 13);
         jLabel1.setFont(labelFont);
         jLabel2.setFont(labelFont);
@@ -104,7 +101,6 @@ public class HopDong extends javax.swing.JPanel {
         jLabel5.setForeground(new Color(44, 62, 80));
         jLabel6.setForeground(new Color(44, 62, 80));
 
-        // Style text fields
         Font textFieldFont = new Font("Segoe UI", Font.PLAIN, 13);
         Border textFieldBorder = BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(BORDER_COLOR, 1),
@@ -113,45 +109,48 @@ public class HopDong extends javax.swing.JPanel {
         
         txtSoHD.setFont(textFieldFont);
         txtNgayKy.setFont(textFieldFont);
-        txtMaKH_HD.setFont(textFieldFont);
+        // cmbMaKH_HD.setFont(textFieldFont); // Style cho ComboBox
         txtSoDienKe.setFont(textFieldFont);
         txtKWDinhMuc.setFont(textFieldFont);
         txtDonGiaKW.setFont(textFieldFont);
         
         txtSoHD.setBorder(textFieldBorder);
         txtNgayKy.setBorder(textFieldBorder);
-        txtMaKH_HD.setBorder(textFieldBorder);
+        // cmbMaKH_HD.setBorder(textFieldBorder);
         txtSoDienKe.setBorder(textFieldBorder);
         txtKWDinhMuc.setBorder(textFieldBorder);
         txtDonGiaKW.setBorder(textFieldBorder);
 
-        // Style buttons
-        styleButton(btnLoadHD, new Color(52, 152, 219)); // Blue
-        styleButton(btnAddHD, new Color(39, 174, 96));   // Green
-        styleButton(btnUpdateHD, new Color(243, 156, 18)); // Orange
-        styleButton(btnDeleteHD, new Color(231, 76, 60)); // Red
+        // === SỬA: Thêm style cho ô khóa chính bị vô hiệu hóa ===
+        txtSoHD.setBackground(DISABLED_BACKGROUND);
+        txtSoHD.setForeground(new Color(100, 100, 100));
 
-        // Style table
+        styleButton(btnLoadHD, new Color(52, 152, 219));
+        styleButton(btnAddHD, new Color(39, 174, 96));
+        styleButton(btnUpdateHD, new Color(243, 156, 18));
+        styleButton(btnDeleteHD, new Color(231, 76, 60));
+
+        // ... (Giữ nguyên phần còn lại của hàm) ...
         tblHopDong.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         tblHopDong.setRowHeight(25);
         tblHopDong.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         tblHopDong.getTableHeader().setBackground(new Color(52, 73, 94));
-        tblHopDong.getTableHeader().setForeground(Color.WHITE);
+        tblHopDong.getTableHeader().setForeground(Color.BLACK);
         tblHopDong.setShowGrid(true);
         tblHopDong.setGridColor(new Color(236, 240, 241));
 
-        // Style scroll pane
         jScrollPane1.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(BORDER_COLOR, 1),
             BorderFactory.createEmptyBorder(0, 0, 0, 0)
         ));
 
-        // Style split pane
         jSplitPane1.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         jSplitPane1.setBackground(BACKGROUND_COLOR);
     }
 
+    // (Hàm styleButton giữ nguyên)
     private void styleButton(JButton button, Color color) {
+        // ... (Giữ nguyên code) ...
         button.setFont(new Font("Segoe UI", Font.BOLD, 12));
         button.setFocusPainted(false);
         button.setBorderPainted(false);
@@ -159,7 +158,6 @@ public class HopDong extends javax.swing.JPanel {
         button.setForeground(Color.WHITE);
         button.setPreferredSize(new Dimension(90, 35));
         
-        // Hover effects
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(color.darker());
@@ -184,7 +182,6 @@ public class HopDong extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         txtNgayKy = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        txtMaKH_HD = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         txtSoDienKe = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
@@ -195,6 +192,10 @@ public class HopDong extends javax.swing.JPanel {
         btnAddHD = new javax.swing.JButton();
         btnUpdateHD = new javax.swing.JButton();
         btnDeleteHD = new javax.swing.JButton();
+        
+        // === SỬA: Khởi tạo ComboBox ===
+        // (Bạn phải làm điều này trong Design View)
+        cmbMaKH_HD = new javax.swing.JComboBox<>();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -210,7 +211,10 @@ public class HopDong extends javax.swing.JPanel {
             new java.awt.Color(41, 128, 185)
         ));
 
-        jLabel1.setText("Số Hợp Đồng:");
+        jLabel1.setText("Số Hợp Đồng (Auto):"); // Sửa Text
+        txtSoHD.setEditable(false); // Sửa: Thêm dòng này
+        txtSoHD.setFocusable(false); // Sửa: Thêm dòng này
+        
         jLabel2.setText("Ngày Ký (yyyy-mm-dd):");
         jLabel3.setText("Mã Khách Hàng:");
         jLabel4.setText("Số Điện Kế:");
@@ -251,6 +255,7 @@ public class HopDong extends javax.swing.JPanel {
         });
         panelButtons.add(btnDeleteHD);
 
+        // === SỬA: Bố cục Layout để chứa ComboBox ===
         javax.swing.GroupLayout panelFormLayout = new javax.swing.GroupLayout(panelForm);
         panelForm.setLayout(panelFormLayout);
         panelFormLayout.setHorizontalGroup(
@@ -271,7 +276,7 @@ public class HopDong extends javax.swing.JPanel {
                         .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtSoHD)
                             .addComponent(txtNgayKy)
-                            .addComponent(txtMaKH_HD)
+                            .addComponent(cmbMaKH_HD, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE) // Sửa
                             .addComponent(txtSoDienKe)
                             .addComponent(txtKWDinhMuc)
                             .addComponent(txtDonGiaKW))))
@@ -291,7 +296,7 @@ public class HopDong extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(txtMaKH_HD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cmbMaKH_HD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)) // Sửa
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
@@ -308,9 +313,11 @@ public class HopDong extends javax.swing.JPanel {
                 .addComponent(panelButtons, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+        // === HẾT SỬA BỐ CỤC ===
 
         jSplitPane1.setLeftComponent(panelForm);
 
+        // (Model Bảng giữ nguyên)
         tblHopDong.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -341,39 +348,52 @@ public class HopDong extends javax.swing.JPanel {
         add(jSplitPane1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
+    // (Hàm btnLoadHDActionPerformed giữ nguyên)
     private void btnLoadHDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadHDActionPerformed
         String endpoint = "/HOPDONG/Index";
         txtLogOutput.setText("Đang tải dữ liệu Hợp Đồng từ tất cả các site...\n");
         
         new Thread(() -> {
             setAllButtonsEnabled(false);
-            dataModel.getDataFromAllSites(ipFile, tblHopDong, txtLogOutput, endpoint);
+            dataModel.fetchAllSitesData(ipFile, tblHopDong, txtLogOutput, endpoint);
             javax.swing.SwingUtilities.invokeLater(() -> {
                 setAllButtonsEnabled(true);
             });
         }).start();
     }//GEN-LAST:event_btnLoadHDActionPerformed
 
+    
+    // === SỬA HÀM ADD ===
     private void btnAddHDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddHDActionPerformed
         String endpoint = "/HOPDONG/Add";
         
         Map<String, String> params = new HashMap<>();
-        params.put("soHD", txtSoHD.getText());
+        // Không gửi soHD (SP sẽ tự tạo)
         params.put("ngayKy", txtNgayKy.getText());
-        params.put("maKH", txtMaKH_HD.getText());
+        
+        // Lấy maKH từ ComboBox
+        String maKH = "";
+        if (cmbMaKH_HD.getSelectedItem() != null) {
+            maKH = cmbMaKH_HD.getSelectedItem().toString();
+        }
+        params.put("maKH", maKH);
+        
         params.put("soDienKe", txtSoDienKe.getText());
         params.put("kwDinhMuc", txtKWDinhMuc.getText());
         params.put("dongiaKW", txtDonGiaKW.getText());
 
-        if (params.get("soHD").isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập Số HĐ.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        if (params.get("maKH").isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một Khách Hàng.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        
+        // (Kiểm tra định dạng ngày, số... ở đây nếu cần)
 
         txtLogOutput.setText("Đang gửi lệnh THÊM Hợp Đồng đến MÁY CHÍNH...\n");
         
         new Thread(() -> {
             setAllButtonsEnabled(false);
+            // Gọi API (API sẽ gọi sp_TaoHopDongTuDong)
             boolean isSuccess = dataModel.postToMaster(txtLogOutput, params, endpoint);
             
             if(isSuccess) {
@@ -389,13 +409,22 @@ public class HopDong extends javax.swing.JPanel {
         }).start();
     }//GEN-LAST:event_btnAddHDActionPerformed
 
+    
+    // === SỬA HÀM UPDATE ===
     private void btnUpdateHDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateHDActionPerformed
         String endpoint = "/HOPDONG/Update";
         
         Map<String, String> params = new HashMap<>();
-        params.put("soHD", txtSoHD.getText());
+        params.put("soHD", txtSoHD.getText()); // Khóa chính (string)
         params.put("ngayKy", txtNgayKy.getText());
-        params.put("maKH", txtMaKH_HD.getText());
+        
+        // Lấy maKH từ ComboBox
+        String maKH = "";
+        if (cmbMaKH_HD.getSelectedItem() != null) {
+            maKH = cmbMaKH_HD.getSelectedItem().toString();
+        }
+        params.put("maKH", maKH);
+        
         params.put("soDienKe", txtSoDienKe.getText());
         params.put("kwDinhMuc", txtKWDinhMuc.getText());
         params.put("dongiaKW", txtDonGiaKW.getText());
@@ -424,11 +453,13 @@ public class HopDong extends javax.swing.JPanel {
         }).start();
     }//GEN-LAST:event_btnUpdateHDActionPerformed
 
+    
+    // === SỬA HÀM DELETE ===
     private void btnDeleteHDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteHDActionPerformed
         String endpoint = "/HOPDONG/Delete";
         
         Map<String, String> params = new HashMap<>();
-        params.put("soHD", txtSoHD.getText());
+        params.put("soHD", txtSoHD.getText()); // Khóa chính (string)
 
         if (params.get("soHD").isEmpty()) {
             JOptionPane.showMessageDialog(this, "Bạn phải chọn một Hợp Đồng (Số HĐ) để xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -463,10 +494,9 @@ public class HopDong extends javax.swing.JPanel {
         }).start();
     }//GEN-LAST:event_btnDeleteHDActionPerformed
 
-    /**
-     * Hàm tiện ích để bật/tắt tất cả các nút (chạy trên luồng giao diện)
-     */
+    // (Hàm setAllButtonsEnabled giữ nguyên)
     private void setAllButtonsEnabled(boolean enabled) {
+        // ... (Giữ nguyên code) ...
         if (javax.swing.SwingUtilities.isEventDispatchThread()) {
             btnLoadHD.setEnabled(enabled);
             btnAddHD.setEnabled(enabled);
@@ -500,9 +530,11 @@ public class HopDong extends javax.swing.JPanel {
     private javax.swing.JTable tblHopDong;
     private javax.swing.JTextField txtDonGiaKW;
     private javax.swing.JTextField txtKWDinhMuc;
-    private javax.swing.JTextField txtMaKH_HD;
     private javax.swing.JTextField txtNgayKy;
     private javax.swing.JTextField txtSoDienKe;
     private javax.swing.JTextField txtSoHD;
+    
+    // === SỬA: Khai báo ComboBox ===
+    private javax.swing.JComboBox<String> cmbMaKH_HD;
     // End of variables declaration//GEN-END:variables
 }
