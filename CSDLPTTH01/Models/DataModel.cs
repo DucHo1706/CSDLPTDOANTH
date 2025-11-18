@@ -10,7 +10,7 @@ namespace CSDLPTTH01.Models
 {
     public class DataModel
     {
-        public static string connectionString = "Server=Duckr5;Database=QL_DienLuc;User Id=sa; Password=123; Encrypt=False;TrustServerCertificate=True;MultipleActiveResultSets=True";
+        public static string connectionString = "Server=HAIDANG\\HAIDANGCSDLPTTH ;Database=QL_DienLuc;User Id=sa; Password=123; Encrypt=False;TrustServerCertificate=True;MultipleActiveResultSets=True";
 
         /**
          * Hàm get (SELECT) đã được cập nhật

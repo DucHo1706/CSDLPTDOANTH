@@ -32,7 +32,6 @@ public class HoaDon extends javax.swing.JPanel {
     private final Color BACKGROUND_COLOR = new Color(245, 245, 245);
     private final Color PANEL_BACKGROUND = Color.WHITE;
     private final Color BORDER_COLOR = new Color(189, 195, 199);
-    private final Color DISABLED_BACKGROUND = new Color(240, 240, 240);
 
     /**
      * Creates new form HoaDonPanel
@@ -67,8 +66,7 @@ public class HoaDon extends javax.swing.JPanel {
                     txtThang.setText(tblHoaDon.getValueAt(row, 1).toString());
                     txtNam.setText(tblHoaDon.getValueAt(row, 2).toString());
                     
-                    // === SỬA: Đặt giá trị cho ComboBox ===
-                    // (Giả sử ComboBox lưu String)
+                    // Đặt giá trị cho ComboBox
                     cmbSoHD_HOADON.setSelectedItem(tblHoaDon.getValueAt(row, 3).toString());
                     cmbMaNV_HOADON.setSelectedItem(tblHoaDon.getValueAt(row, 4).toString());
                     
@@ -79,9 +77,17 @@ public class HoaDon extends javax.swing.JPanel {
         });
     }
 
-    // (Hàm applyModernStyling giữ nguyên, không cần sửa)
+    // Hàm reset form
+    private void resetForm() {
+        txtSoHDN.setText("");
+        txtThang.setText("");
+        txtNam.setText("");
+        cmbSoHD_HOADON.setSelectedIndex(0);
+        cmbMaNV_HOADON.setSelectedIndex(0);
+        txtSoTien.setText("");
+    }
+
     private void applyModernStyling() {
-        // ... (Giữ nguyên code) ...
         setBackground(BACKGROUND_COLOR);
         panelForm.setBackground(PANEL_BACKGROUND);
         panelButtons.setBackground(PANEL_BACKGROUND);
@@ -111,19 +117,12 @@ public class HoaDon extends javax.swing.JPanel {
         txtSoHDN.setFont(textFieldFont);
         txtThang.setFont(textFieldFont);
         txtNam.setFont(textFieldFont);
-        // cmbSoHD_HOADON.setFont(textFieldFont); // Style cho ComboBox
-        // cmbMaNV_HOADON.setFont(textFieldFont); // Style cho ComboBox
         txtSoTien.setFont(textFieldFont);
         
         txtSoHDN.setBorder(textFieldBorder);
         txtThang.setBorder(textFieldBorder);
         txtNam.setBorder(textFieldBorder);
-        // cmbSoHD_HOADON.setBorder(textFieldBorder);
-        // cmbMaNV_HOADON.setBorder(textFieldBorder);
         txtSoTien.setBorder(textFieldBorder);
-
-        txtSoHDN.setBackground(DISABLED_BACKGROUND);
-        txtSoHDN.setForeground(new Color(100, 100, 100));
 
         styleButton(btnLoadHOADON, new Color(52, 152, 219)); 
         styleButton(btnAddHOADON, new Color(39, 174, 96));   
@@ -147,9 +146,7 @@ public class HoaDon extends javax.swing.JPanel {
         jSplitPane1.setBackground(BACKGROUND_COLOR);
     }
     
-    // (Hàm styleButton giữ nguyên, không cần sửa)
     private void styleButton(JButton button, Color color) {
-        // ... (Giữ nguyên code) ...
         button.setFont(new Font("Segoe UI", Font.BOLD, 12));
         button.setFocusPainted(false);
         button.setBorderPainted(false);
@@ -167,9 +164,7 @@ public class HoaDon extends javax.swing.JPanel {
         });
     }
 
-    
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
@@ -191,9 +186,6 @@ public class HoaDon extends javax.swing.JPanel {
         btnAddHOADON = new javax.swing.JButton();
         btnUpdateHOADON = new javax.swing.JButton();
         btnDeleteHOADON = new javax.swing.JButton();
-        
-        // === SỬA: Khởi tạo 2 ComboBox ===
-        // (Bạn phải làm điều này trong Design View)
         cmbSoHD_HOADON = new javax.swing.JComboBox<>();
         cmbMaNV_HOADON = new javax.swing.JComboBox<>();
 
@@ -211,10 +203,7 @@ public class HoaDon extends javax.swing.JPanel {
             new java.awt.Color(41, 128, 185)
         ));
 
-        jLabel1.setText("Số HĐN (Auto):");
-        txtSoHDN.setEditable(false);
-        txtSoHDN.setFocusable(false);
-        
+        jLabel1.setText("Số HĐN:"); // Đã sửa: bỏ "(Auto)"
         jLabel2.setText("Tháng:");
         jLabel3.setText("Năm:");
         jLabel4.setText("Số HĐ (Hợp Đồng):");
@@ -255,7 +244,6 @@ public class HoaDon extends javax.swing.JPanel {
         });
         panelButtons.add(btnDeleteHOADON);
 
-        // === SỬA: Bố cục Layout để chứa ComboBox ===
         javax.swing.GroupLayout panelFormLayout = new javax.swing.GroupLayout(panelForm);
         panelForm.setLayout(panelFormLayout);
         panelFormLayout.setHorizontalGroup(
@@ -277,8 +265,8 @@ public class HoaDon extends javax.swing.JPanel {
                             .addComponent(txtSoHDN)
                             .addComponent(txtThang)
                             .addComponent(txtNam)
-                            .addComponent(cmbSoHD_HOADON, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE) // Sửa
-                            .addComponent(cmbMaNV_HOADON, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE) // Sửa
+                            .addComponent(cmbSoHD_HOADON, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cmbMaNV_HOADON, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(txtSoTien))))
                 .addContainerGap())
         );
@@ -300,11 +288,11 @@ public class HoaDon extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(cmbSoHD_HOADON, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)) // Sửa
+                    .addComponent(cmbSoHD_HOADON, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(cmbMaNV_HOADON, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)) // Sửa
+                    .addComponent(cmbMaNV_HOADON, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
@@ -313,7 +301,6 @@ public class HoaDon extends javax.swing.JPanel {
                 .addComponent(panelButtons, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        // === HẾT SỬA BỐ CỤC ===
 
         jSplitPane1.setLeftComponent(panelForm);
 
@@ -345,10 +332,9 @@ public class HoaDon extends javax.swing.JPanel {
         jSplitPane1.setRightComponent(jScrollPane1);
 
         add(jSplitPane1, java.awt.BorderLayout.CENTER);
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
-    // (Hàm btnLoadHOADONActionPerformed giữ nguyên, không cần sửa)
-    private void btnLoadHOADONActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadHOADONActionPerformed
+    private void btnLoadHOADONActionPerformed(java.awt.event.ActionEvent evt) {
         String endpoint = "/HOADON/Index";
         txtLogOutput.setText("Đang tải dữ liệu Hóa Đơn từ tất cả các site...\n");
         
@@ -359,17 +345,16 @@ public class HoaDon extends javax.swing.JPanel {
                 setAllButtonsEnabled(true);
             });
         }).start();
-    }//GEN-LAST:event_btnLoadHOADONActionPerformed
+    }
 
-    
-    // === SỬA HÀM ADD ===
-    private void btnAddHOADONActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddHOADONActionPerformed
+    private void btnAddHOADONActionPerformed(java.awt.event.ActionEvent evt) {
         String endpoint = "/HOADON/Add";
         
         Map<String, String> params = new HashMap<>();
-        // Không gửi soHDN (SP sẽ tự tạo)
-        params.put("thang", txtThang.getText());
-        params.put("nam", txtNam.getText());
+        // Gửi số hóa đơn do người dùng nhập
+        params.put("soHDN", txtSoHDN.getText().trim());
+        params.put("thang", txtThang.getText().trim());
+        params.put("nam", txtNam.getText().trim());
         
         // Lấy dữ liệu từ ComboBox
         String soHD = "";
@@ -384,42 +369,68 @@ public class HoaDon extends javax.swing.JPanel {
         
         params.put("soHD", soHD);
         params.put("maNV", maNV);
-        params.put("soTien", txtSoTien.getText());
+        params.put("soTien", txtSoTien.getText().trim());
 
-        if (params.get("soHD").isEmpty() || params.get("maNV").isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn Hợp Đồng và Nhân Viên.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        // Kiểm tra dữ liệu đầu vào
+        if (params.get("soHDN").isEmpty() || params.get("thang").isEmpty() || 
+            params.get("nam").isEmpty() || params.get("soHD").isEmpty() ||
+            params.get("maNV").isEmpty() || params.get("soTien").isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin hóa đơn.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Validate số hóa đơn
+        if (!params.get("soHDN").matches("^[a-zA-Z0-9]+$")) {
+            JOptionPane.showMessageDialog(this, "Số hóa đơn chỉ được chứa chữ cái và số.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Validate tháng, năm và số tiền là số
+        try {
+            Integer.parseInt(params.get("thang"));
+            Integer.parseInt(params.get("nam"));
+            Double.parseDouble(params.get("soTien"));
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Tháng, Năm và Số Tiền phải là số.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         txtLogOutput.setText("Đang gửi lệnh THÊM Hóa Đơn đến MÁY CHÍNH...\n");
+        txtLogOutput.append("Số HĐN: " + params.get("soHDN") + "\n");
+        txtLogOutput.append("Tháng: " + params.get("thang") + "\n");
+        txtLogOutput.append("Năm: " + params.get("nam") + "\n");
+        txtLogOutput.append("Số HĐ: " + params.get("soHD") + "\n");
+        txtLogOutput.append("Mã NV: " + params.get("maNV") + "\n");
+        txtLogOutput.append("Số Tiền: " + params.get("soTien") + "\n");
         
         new Thread(() -> {
             setAllButtonsEnabled(false);
-            // Gọi API (API sẽ gọi sp_TaoHoaDonTuDong)
+            // Gọi API với số hóa đơn do người dùng nhập
             boolean isSuccess = dataModel.postToMaster(txtLogOutput, params, endpoint);
             
             if(isSuccess) {
-                txtLogOutput.append("\nĐang tải lại dữ liệu (chờ Replication)...");
+                txtLogOutput.append("\n✅ THÊM THÀNH CÔNG! Đang tải lại dữ liệu...");
                 try { Thread.sleep(2000); } catch (Exception e) {}
                 btnLoadHOADONActionPerformed(null);
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    resetForm(); // Reset form sau khi thêm thành công
+                });
             } else {
-                txtLogOutput.append("\n==> THÊM THẤT BẠI. Dữ liệu sẽ không được tải lại.");
+                txtLogOutput.append("\n❌ THÊM THẤT BẠI.");
                 javax.swing.SwingUtilities.invokeLater(() -> {
                     setAllButtonsEnabled(true);
                 });
             }
         }).start();
-    }//GEN-LAST:event_btnAddHOADONActionPerformed
+    }
 
-    
-    // === SỬA HÀM UPDATE ===
-    private void btnUpdateHOADONActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateHOADONActionPerformed
+    private void btnUpdateHOADONActionPerformed(java.awt.event.ActionEvent evt) {
         String endpoint = "/HOADON/Update";
         
         Map<String, String> params = new HashMap<>();
-        params.put("soHDN", txtSoHDN.getText()); // Khóa chính (string)
-        params.put("thang", txtThang.getText());
-        params.put("nam", txtNam.getText());
+        params.put("soHDN", txtSoHDN.getText().trim());
+        params.put("thang", txtThang.getText().trim());
+        params.put("nam", txtNam.getText().trim());
 
         // Lấy dữ liệu từ ComboBox
         String soHD = "";
@@ -434,7 +445,7 @@ public class HoaDon extends javax.swing.JPanel {
 
         params.put("soHD", soHD);
         params.put("maNV", maNV);
-        params.put("soTien", txtSoTien.getText());
+        params.put("soTien", txtSoTien.getText().trim());
 
         if (params.get("soHDN").isEmpty()) {
             JOptionPane.showMessageDialog(this, "Bạn phải chọn một Hóa Đơn (Số HĐN) để sửa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -458,15 +469,13 @@ public class HoaDon extends javax.swing.JPanel {
                 });
             }
         }).start();
-    }//GEN-LAST:event_btnUpdateHOADONActionPerformed
+    }
 
-    
-    // === SỬA HÀM DELETE ===
-    private void btnDeleteHOADONActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteHOADONActionPerformed
+    private void btnDeleteHOADONActionPerformed(java.awt.event.ActionEvent evt) {
         String endpoint = "/HOADON/Delete";
         
         Map<String, String> params = new HashMap<>();
-        params.put("soHDN", txtSoHDN.getText()); // Khóa chính (string)
+        params.put("soHDN", txtSoHDN.getText().trim());
 
         if (params.get("soHDN").isEmpty()) {
             JOptionPane.showMessageDialog(this, "Bạn phải chọn một Hóa Đơn (Số HĐN) để xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -492,6 +501,9 @@ public class HoaDon extends javax.swing.JPanel {
                 txtLogOutput.append("\nĐang tải lại dữ liệu (chờ Replication)...");
                 try { Thread.sleep(2000); } catch (Exception e) {}
                 btnLoadHOADONActionPerformed(null);
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    resetForm(); // Reset form sau khi xóa thành công
+                });
             } else {
                 txtLogOutput.append("\n==> XÓA THẤT BẠI. Dữ liệu sẽ không được tải lại.");
                 javax.swing.SwingUtilities.invokeLater(() -> {
@@ -499,11 +511,9 @@ public class HoaDon extends javax.swing.JPanel {
                 });
             }
         }).start();
-    }//GEN-LAST:event_btnDeleteHOADONActionPerformed
+    }
 
-    // (Hàm setAllButtonsEnabled giữ nguyên)
     private void setAllButtonsEnabled(boolean enabled) {
-        // ... (Giữ nguyên code) ...
         if (javax.swing.SwingUtilities.isEventDispatchThread()) {
             btnLoadHOADON.setEnabled(enabled);
             btnAddHOADON.setEnabled(enabled);
@@ -519,11 +529,13 @@ public class HoaDon extends javax.swing.JPanel {
         }
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration
     private javax.swing.JButton btnAddHOADON;
     private javax.swing.JButton btnDeleteHOADON;
     private javax.swing.JButton btnLoadHOADON;
     private javax.swing.JButton btnUpdateHOADON;
+    private javax.swing.JComboBox<String> cmbMaNV_HOADON;
+    private javax.swing.JComboBox<String> cmbSoHD_HOADON;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -539,9 +551,4 @@ public class HoaDon extends javax.swing.JPanel {
     private javax.swing.JTextField txtSoHDN;
     private javax.swing.JTextField txtSoTien;
     private javax.swing.JTextField txtThang;
-    
-    // === SỬA: Khai báo 2 ComboBox ===
-    private javax.swing.JComboBox<String> cmbMaNV_HOADON;
-    private javax.swing.JComboBox<String> cmbSoHD_HOADON;
-    // End of variables declaration//GEN-END:variables
 }

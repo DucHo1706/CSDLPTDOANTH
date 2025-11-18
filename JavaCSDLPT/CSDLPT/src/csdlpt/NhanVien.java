@@ -32,7 +32,7 @@ public class NhanVien extends javax.swing.JPanel {
     private final Color BACKGROUND_COLOR = new Color(245, 245, 245);
     private final Color PANEL_BACKGROUND = Color.WHITE;
     private final Color BORDER_COLOR = new Color(189, 195, 199);
-    private final Color DISABLED_BACKGROUND = new Color(240, 240, 240); // Thêm màu này
+    private final Color DISABLED_BACKGROUND = new Color(240, 240, 240);
 
     /**
      * Creates new form NhanVienPanel
@@ -51,7 +51,7 @@ public class NhanVien extends javax.swing.JPanel {
         this.ipFile = file;
         this.txtLogOutput = log;
         
-        // === THÊM MỚI: Tải dữ liệu cho ComboBox khi mở tab ===
+        // Tải dữ liệu cho ComboBox khi mở tab
         dataModel.loadComboBoxData(cmbMaCN_NV, txtLogOutput, "/CHINHANH/Index");
     }
     
@@ -66,16 +66,21 @@ public class NhanVien extends javax.swing.JPanel {
                     txtMaNV.setText(tblNhanVien.getValueAt(row, 0).toString());
                     txtTenNV.setText(tblNhanVien.getValueAt(row, 1).toString());
                     
-                    // === SỬA: Đặt giá trị cho ComboBox ===
+                    // Đặt giá trị cho ComboBox
                     cmbMaCN_NV.setSelectedItem(tblNhanVien.getValueAt(row, 2).toString());
                 }
             }
         });
     }
 
-    // (Hàm applyModernStyling giữ nguyên, chỉ sửa 1 dòng)
+    // Hàm reset form
+    private void resetForm() {
+        txtMaNV.setText("");
+        txtTenNV.setText("");
+        cmbMaCN_NV.setSelectedIndex(0);
+    }
+
     private void applyModernStyling() {
-        // ... (Giữ nguyên code) ...
         setBackground(BACKGROUND_COLOR);
         panelForm.setBackground(PANEL_BACKGROUND);
         panelButtons.setBackground(PANEL_BACKGROUND);
@@ -98,22 +103,15 @@ public class NhanVien extends javax.swing.JPanel {
         
         txtMaNV.setFont(textFieldFont);
         txtTenNV.setFont(textFieldFont);
-        // cmbMaCN_NV.setFont(textFieldFont); // Style ComboBox
         
         txtMaNV.setBorder(textFieldBorder);
         txtTenNV.setBorder(textFieldBorder);
-        // cmbMaCN_NV.setBorder(textFieldBorder);
-
-        // === SỬA: Thêm style cho ô khóa chính bị vô hiệu hóa ===
-        txtMaNV.setBackground(DISABLED_BACKGROUND);
-        txtMaNV.setForeground(new Color(100, 100, 100));
 
         styleButton(btnLoadNV, new Color(52, 152, 219));
         styleButton(btnAddNV, new Color(39, 174, 96));
         styleButton(btnUpdateNV, new Color(243, 156, 18));
         styleButton(btnDeleteNV, new Color(231, 76, 60));
 
-        // ... (Giữ nguyên phần còn lại của hàm) ...
         tblNhanVien.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         tblNhanVien.setRowHeight(25);
         tblNhanVien.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
@@ -131,9 +129,7 @@ public class NhanVien extends javax.swing.JPanel {
         jSplitPane1.setBackground(BACKGROUND_COLOR);
     }
 
-    // (Hàm styleButton giữ nguyên)
     private void styleButton(JButton button, Color color) {
-        // ... (Giữ nguyên code) ...
         button.setFont(new Font("Segoe UI", Font.BOLD, 12));
         button.setFocusPainted(false);
         button.setBorderPainted(false);
@@ -152,7 +148,6 @@ public class NhanVien extends javax.swing.JPanel {
     }
 
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
@@ -169,9 +164,6 @@ public class NhanVien extends javax.swing.JPanel {
         btnAddNV = new javax.swing.JButton();
         btnUpdateNV = new javax.swing.JButton();
         btnDeleteNV = new javax.swing.JButton();
-        
-        // === SỬA: Khởi tạo ComboBox ===
-        // (Bạn phải làm điều này trong Design View)
         cmbMaCN_NV = new javax.swing.JComboBox<>();
 
         setLayout(new java.awt.BorderLayout());
@@ -188,10 +180,7 @@ public class NhanVien extends javax.swing.JPanel {
             new java.awt.Color(41, 128, 185)
         ));
 
-        jLabel1.setText("Mã Nhân Viên (Auto):"); // Sửa Text
-        txtMaNV.setEditable(false); // Sửa: Thêm dòng này
-        txtMaNV.setFocusable(false); // Sửa: Thêm dòng này
-        
+        jLabel1.setText("Mã Nhân Viên:");
         jLabel2.setText("Tên Nhân Viên:");
         jLabel3.setText("Mã Chi Nhánh:");
 
@@ -229,7 +218,6 @@ public class NhanVien extends javax.swing.JPanel {
         });
         panelButtons.add(btnDeleteNV);
 
-        // === SỬA: Bố cục Layout để chứa ComboBox ===
         javax.swing.GroupLayout panelFormLayout = new javax.swing.GroupLayout(panelForm);
         panelForm.setLayout(panelFormLayout);
         panelFormLayout.setHorizontalGroup(
@@ -247,7 +235,7 @@ public class NhanVien extends javax.swing.JPanel {
                         .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtMaNV)
                             .addComponent(txtTenNV)
-                            .addComponent(cmbMaCN_NV, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))) // Sửa
+                            .addComponent(cmbMaCN_NV, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         panelFormLayout.setVerticalGroup(
@@ -264,16 +252,14 @@ public class NhanVien extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(cmbMaCN_NV, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)) // Sửa
+                    .addComponent(cmbMaCN_NV, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(30, 30, 30)
                 .addComponent(panelButtons, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        // === HẾT SỬA BỐ CỤC ===
 
         jSplitPane1.setLeftComponent(panelForm);
 
-        // (Model Bảng giữ nguyên)
         tblNhanVien.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -302,10 +288,9 @@ public class NhanVien extends javax.swing.JPanel {
         jSplitPane1.setRightComponent(jScrollPane1);
 
         add(jSplitPane1, java.awt.BorderLayout.CENTER);
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
-    // (Hàm btnLoadNVActionPerformed giữ nguyên)
-    private void btnLoadNVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadNVActionPerformed
+    private void btnLoadNVActionPerformed(java.awt.event.ActionEvent evt) {
         String endpoint = "/NHANVIEN/Index";
         txtLogOutput.setText("Đang tải dữ liệu Nhân Viên từ tất cả các site...\n");
         
@@ -316,16 +301,15 @@ public class NhanVien extends javax.swing.JPanel {
                 setAllButtonsEnabled(true);
             });
         }).start();
-    }//GEN-LAST:event_btnLoadNVActionPerformed
+    }
 
-    
-    // === SỬA HÀM ADD ===
-    private void btnAddNVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddNVActionPerformed
+    private void btnAddNVActionPerformed(java.awt.event.ActionEvent evt) {
         String endpoint = "/NHANVIEN/Add";
         
         Map<String, String> params = new HashMap<>();
-        // Không gửi maNV (SP sẽ tự tạo)
-        params.put("hoten", txtTenNV.getText());
+        // Gửi mã nhân viên do người dùng nhập
+        params.put("maNV", txtMaNV.getText().trim());
+        params.put("hoten", txtTenNV.getText().trim());
         
         // Lấy maCN từ ComboBox
         String maCN = "";
@@ -334,8 +318,9 @@ public class NhanVien extends javax.swing.JPanel {
         }
         params.put("maCN", maCN);
 
-        if (params.get("hoten").isEmpty() || params.get("maCN").isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập Họ Tên và chọn Chi Nhánh.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        // Kiểm tra dữ liệu đầu vào
+        if (params.get("maNV").isEmpty() || params.get("hoten").isEmpty() || params.get("maCN").isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin: Mã NV, Tên NV và chọn Chi Nhánh.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -343,13 +328,16 @@ public class NhanVien extends javax.swing.JPanel {
         
         new Thread(() -> {
             setAllButtonsEnabled(false);
-            // Gọi API (API sẽ gọi sp_TaoNhanVienTuDong)
+            // Gọi API với mã nhân viên do người dùng nhập
             boolean isSuccess = dataModel.postToMaster(txtLogOutput, params, endpoint);
             
             if(isSuccess) {
                 txtLogOutput.append("\nĐang tải lại dữ liệu (chờ Replication)...");
                 try { Thread.sleep(2000); } catch (Exception e) {}
                 btnLoadNVActionPerformed(null);
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    resetForm(); // Reset form sau khi thêm thành công
+                });
             } else {
                 txtLogOutput.append("\n==> THÊM THẤT BẠI. Dữ liệu sẽ không được tải lại.");
                 javax.swing.SwingUtilities.invokeLater(() -> {
@@ -357,16 +345,14 @@ public class NhanVien extends javax.swing.JPanel {
                 });
             }
         }).start();
-    }//GEN-LAST:event_btnAddNVActionPerformed
+    }
 
-    
-    // === SỬA HÀM UPDATE ===
-    private void btnUpdateNVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateNVActionPerformed
+    private void btnUpdateNVActionPerformed(java.awt.event.ActionEvent evt) {
         String endpoint = "/NHANVIEN/Update";
         
         Map<String, String> params = new HashMap<>();
-        params.put("maNV", txtMaNV.getText()); // Khóa chính (string)
-        params.put("hoten", txtTenNV.getText()); // Sửa: tên param là 'hoten'
+        params.put("maNV", txtMaNV.getText().trim());
+        params.put("hoten", txtTenNV.getText().trim());
         
         // Lấy maCN từ ComboBox
         String maCN = "";
@@ -397,15 +383,13 @@ public class NhanVien extends javax.swing.JPanel {
                 });
             }
         }).start();
-    }//GEN-LAST:event_btnUpdateNVActionPerformed
+    }
 
-    
-    // === SỬA HÀM DELETE ===
-    private void btnDeleteNVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteNVActionPerformed
+    private void btnDeleteNVActionPerformed(java.awt.event.ActionEvent evt) {
         String endpoint = "/NHANVIEN/Delete";
         
         Map<String, String> params = new HashMap<>();
-        params.put("maNV", txtMaNV.getText()); // Khóa chính (string)
+        params.put("maNV", txtMaNV.getText().trim());
 
         if (params.get("maNV").isEmpty()) {
             JOptionPane.showMessageDialog(this, "Bạn phải chọn một Nhân Viên (Mã NV) để xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -431,6 +415,9 @@ public class NhanVien extends javax.swing.JPanel {
                 txtLogOutput.append("\nĐang tải lại dữ liệu (chờ Replication)...");
                 try { Thread.sleep(2000); } catch (Exception e) {}
                 btnLoadNVActionPerformed(null);
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    resetForm(); // Reset form sau khi xóa thành công
+                });
             } else {
                 txtLogOutput.append("\n==> XÓA THẤT BẠI. Dữ liệu sẽ không được tải lại.");
                 javax.swing.SwingUtilities.invokeLater(() -> {
@@ -438,11 +425,9 @@ public class NhanVien extends javax.swing.JPanel {
                 });
             }
         }).start();
-    }//GEN-LAST:event_btnDeleteNVActionPerformed
+    }
 
-    // (Hàm setAllButtonsEnabled giữ nguyên)
     private void setAllButtonsEnabled(boolean enabled) {
-        // ... (Giữ nguyên code) ...
         if (javax.swing.SwingUtilities.isEventDispatchThread()) {
             btnLoadNV.setEnabled(enabled);
             btnAddNV.setEnabled(enabled);
@@ -458,11 +443,12 @@ public class NhanVien extends javax.swing.JPanel {
         }
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration
     private javax.swing.JButton btnAddNV;
     private javax.swing.JButton btnDeleteNV;
     private javax.swing.JButton btnLoadNV;
     private javax.swing.JButton btnUpdateNV;
+    private javax.swing.JComboBox<String> cmbMaCN_NV;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -473,8 +459,4 @@ public class NhanVien extends javax.swing.JPanel {
     private javax.swing.JTable tblNhanVien;
     private javax.swing.JTextField txtMaNV;
     private javax.swing.JTextField txtTenNV;
-    
-    // === SỬA: Khai báo ComboBox ===
-    private javax.swing.JComboBox<String> cmbMaCN_NV;
-    // End of variables declaration//GEN-END:variables
 }

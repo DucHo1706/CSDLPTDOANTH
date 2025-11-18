@@ -32,7 +32,6 @@ public class KhachHang extends javax.swing.JPanel {
     private final Color BACKGROUND_COLOR = new Color(245, 245, 245);
     private final Color PANEL_BACKGROUND = Color.WHITE;
     private final Color BORDER_COLOR = new Color(189, 195, 199);
-    private final Color DISABLED_BACKGROUND = new Color(240, 240, 240); // Thêm màu này
 
     public KhachHang() {
         initComponents();
@@ -45,7 +44,7 @@ public class KhachHang extends javax.swing.JPanel {
         this.ipFile = file;
         this.txtLogOutput = log;
         
-        // === THÊM MỚI: Tải dữ liệu cho ComboBox khi mở tab ===
+        // Tải dữ liệu cho ComboBox khi mở tab
         dataModel.loadComboBoxData(cmbMaCN_KH, txtLogOutput, "/CHINHANH/Index");
     }
 
@@ -57,15 +56,21 @@ public class KhachHang extends javax.swing.JPanel {
                     txtMaKH.setText(tblKhachHang.getValueAt(row, 0).toString());
                     txtTenKH.setText(tblKhachHang.getValueAt(row, 1).toString());
                     
-                    // === SỬA: Đặt giá trị cho ComboBox ===
+                    // Đặt giá trị cho ComboBox
                     cmbMaCN_KH.setSelectedItem(tblKhachHang.getValueAt(row, 2).toString());
                 }
             }
         });
     }
 
+    // Hàm reset form
+    private void resetForm() {
+        txtMaKH.setText("");
+        txtTenKH.setText("");
+        cmbMaCN_KH.setSelectedIndex(0);
+    }
+
     private void applyModernStyling() {
-        // ... (Giữ nguyên code) ...
         setBackground(BACKGROUND_COLOR);
         panelForm.setBackground(PANEL_BACKGROUND);
         panelButtons.setBackground(PANEL_BACKGROUND);
@@ -88,22 +93,15 @@ public class KhachHang extends javax.swing.JPanel {
         
         txtMaKH.setFont(textFieldFont);
         txtTenKH.setFont(textFieldFont);
-        // cmbMaCN_KH.setFont(textFieldFont); // Style ComboBox
         
         txtMaKH.setBorder(textFieldBorder);
         txtTenKH.setBorder(textFieldBorder);
-        // cmbMaCN_KH.setBorder(textFieldBorder);
-
-        // === SỬA: Thêm style cho ô khóa chính bị vô hiệu hóa ===
-        txtMaKH.setBackground(DISABLED_BACKGROUND);
-        txtMaKH.setForeground(new Color(100, 100, 100));
 
         styleButton(btnLoadKH, new Color(52, 152, 219)); 
         styleButton(btnAddKH, new Color(39, 174, 96));   
         styleButton(btnUpdateKH, new Color(243, 156, 18)); 
         styleButton(btnDeleteKH, new Color(231, 76, 60)); 
 
-        // ... (Giữ nguyên phần còn lại của hàm) ...
         tblKhachHang.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         tblKhachHang.setRowHeight(25);
         tblKhachHang.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
@@ -121,9 +119,7 @@ public class KhachHang extends javax.swing.JPanel {
         jSplitPane1.setBackground(BACKGROUND_COLOR);
     }
 
-    // (Hàm styleButton giữ nguyên)
     private void styleButton(JButton button, Color color) {
-        // ... (Giữ nguyên code) ...
         button.setFont(new Font("Segoe UI", Font.BOLD, 12));
         button.setFocusPainted(false);
         button.setBorderPainted(false);
@@ -142,7 +138,6 @@ public class KhachHang extends javax.swing.JPanel {
     }
 
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
@@ -159,9 +154,6 @@ public class KhachHang extends javax.swing.JPanel {
         btnAddKH = new javax.swing.JButton();
         btnUpdateKH = new javax.swing.JButton();
         btnDeleteKH = new javax.swing.JButton();
-        
-        // === SỬA: Khởi tạo ComboBox ===
-        // (Bạn phải làm điều này trong Design View)
         cmbMaCN_KH = new javax.swing.JComboBox<>();
 
         setLayout(new java.awt.BorderLayout());
@@ -178,10 +170,7 @@ public class KhachHang extends javax.swing.JPanel {
             new java.awt.Color(41, 128, 185)
         ));
 
-        jLabel1.setText("Mã Khách Hàng (Auto):"); // Sửa Text
-        txtMaKH.setEditable(false); // Sửa: Thêm dòng này
-        txtMaKH.setFocusable(false); // Sửa: Thêm dòng này
-        
+        jLabel1.setText("Mã Khách Hàng:"); // Đã sửa: bỏ "(Auto)"
         jLabel2.setText("Tên Khách Hàng:");
         jLabel3.setText("Mã Chi Nhánh:");
 
@@ -219,7 +208,6 @@ public class KhachHang extends javax.swing.JPanel {
         });
         panelButtons.add(btnDeleteKH);
 
-        // === SỬA: Bố cục Layout để chứa ComboBox ===
         javax.swing.GroupLayout panelFormLayout = new javax.swing.GroupLayout(panelForm);
         panelForm.setLayout(panelFormLayout);
         panelFormLayout.setHorizontalGroup(
@@ -237,7 +225,7 @@ public class KhachHang extends javax.swing.JPanel {
                         .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtMaKH)
                             .addComponent(txtTenKH)
-                            .addComponent(cmbMaCN_KH, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))) // Sửa
+                            .addComponent(cmbMaCN_KH, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         panelFormLayout.setVerticalGroup(
@@ -254,16 +242,14 @@ public class KhachHang extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(cmbMaCN_KH, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)) // Sửa
+                    .addComponent(cmbMaCN_KH, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(30, 30, 30)
                 .addComponent(panelButtons, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        // === HẾT SỬA BỐ CỤC ===
 
         jSplitPane1.setLeftComponent(panelForm);
 
-        // (Model Bảng giữ nguyên)
         tblKhachHang.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -292,9 +278,8 @@ public class KhachHang extends javax.swing.JPanel {
         jSplitPane1.setRightComponent(jScrollPane1);
 
         add(jSplitPane1, java.awt.BorderLayout.CENTER);
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
-    // (Hàm btnLoadKHActionPerformed giữ nguyên)
     private void btnLoadKHActionPerformed(java.awt.event.ActionEvent evt) {
         String endpoint = "/KHACHHANG/Index";
         txtLogOutput.setText("Đang tải dữ liệu Khách Hàng từ tất cả các site...\n");
@@ -308,13 +293,13 @@ public class KhachHang extends javax.swing.JPanel {
         }).start();
     }
 
-    // === SỬA HÀM ADD ===
     private void btnAddKHActionPerformed(java.awt.event.ActionEvent evt) {
         String endpoint = "/KHACHHANG/Add";
         
         Map<String, String> params = new HashMap<>();
-        // Không gửi maKH (SP sẽ tự tạo)
-        params.put("tenKH", txtTenKH.getText());
+        // Gửi mã khách hàng do người dùng nhập
+        params.put("maKH", txtMaKH.getText().trim());
+        params.put("tenKH", txtTenKH.getText().trim());
         
         // Lấy maCN từ ComboBox
         String maCN = "";
@@ -323,25 +308,37 @@ public class KhachHang extends javax.swing.JPanel {
         }
         params.put("maCN", maCN);
 
+        // Kiểm tra dữ liệu đầu vào
+        if (params.get("maKH").isEmpty() || params.get("tenKH").isEmpty() || params.get("maCN").isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin: Mã KH, Tên KH và chọn Chi Nhánh.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        if (params.get("tenKH").isEmpty() || params.get("maCN").isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập Tên KH và chọn Chi Nhánh.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        // Validate mã khách hàng (ví dụ: không chứa ký tự đặc biệt)
+        if (!params.get("maKH").matches("^[a-zA-Z0-9]+$")) {
+            JOptionPane.showMessageDialog(this, "Mã khách hàng chỉ được chứa chữ cái và số.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         txtLogOutput.setText("Đang gửi lệnh THÊM Khách Hàng đến MÁY CHÍNH...\n");
+        txtLogOutput.append("Mã KH: " + params.get("maKH") + "\n");
+        txtLogOutput.append("Tên KH: " + params.get("tenKH") + "\n");
+        txtLogOutput.append("Mã CN: " + params.get("maCN") + "\n");
         
         new Thread(() -> {
             setAllButtonsEnabled(false);
-            // Gọi API (API sẽ gọi sp_TaoKhachHangTuDong)
+            // Gọi API với mã khách hàng do người dùng nhập
             boolean isSuccess = dataModel.postToMaster(txtLogOutput, params, endpoint);
             
             if(isSuccess) {
-                txtLogOutput.append("\nĐang tải lại dữ liệu (chờ Replication)...");
+                txtLogOutput.append("\n✅ THÊM THÀNH CÔNG! Đang tải lại dữ liệu...");
                 try { Thread.sleep(2000); } catch (Exception e) {}
                 btnLoadKHActionPerformed(null);
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    resetForm(); // Reset form sau khi thêm thành công
+                });
             } else {
-                txtLogOutput.append("\n==> THÊM THẤT BẠI. Dữ liệu sẽ không được tải lại.");
+                txtLogOutput.append("\n❌ THÊM THẤT BẠI.");
                 javax.swing.SwingUtilities.invokeLater(() -> {
                     setAllButtonsEnabled(true);
                 });
@@ -349,13 +346,12 @@ public class KhachHang extends javax.swing.JPanel {
         }).start();
     }
 
-    // === SỬA HÀM UPDATE ===
     private void btnUpdateKHActionPerformed(java.awt.event.ActionEvent evt) {
         String endpoint = "/KHACHHANG/Update";
         
         Map<String, String> params = new HashMap<>();
-        params.put("maKH", txtMaKH.getText()); // Khóa chính (string)
-        params.put("tenKH", txtTenKH.getText());
+        params.put("maKH", txtMaKH.getText().trim());
+        params.put("tenKH", txtTenKH.getText().trim());
         
         // Lấy maCN từ ComboBox
         String maCN = "";
@@ -388,12 +384,11 @@ public class KhachHang extends javax.swing.JPanel {
         }).start();
     }
 
-    // === SỬA HÀM DELETE ===
     private void btnDeleteKHActionPerformed(java.awt.event.ActionEvent evt) {
         String endpoint = "/KHACHHANG/Delete";
         
         Map<String, String> params = new HashMap<>();
-        params.put("maKH", txtMaKH.getText()); // Khóa chính (string)
+        params.put("maKH", txtMaKH.getText().trim());
 
         if (params.get("maKH").isEmpty()) {
             JOptionPane.showMessageDialog(this, "Bạn phải chọn một Khách Hàng (Mã KH) để xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -419,6 +414,9 @@ public class KhachHang extends javax.swing.JPanel {
                 txtLogOutput.append("\nĐang tải lại dữ liệu (chờ Replication)...");
                 try { Thread.sleep(2000); } catch (Exception e) {}
                 btnLoadKHActionPerformed(null);
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    resetForm(); // Reset form sau khi xóa thành công
+                });
             } else {
                 txtLogOutput.append("\n==> XÓA THẤT BẠI. Dữ liệu sẽ không được tải lại.");
                 javax.swing.SwingUtilities.invokeLater(() -> {
@@ -428,9 +426,7 @@ public class KhachHang extends javax.swing.JPanel {
         }).start();
     }
     
-    // (Hàm setAllButtonsEnabled giữ nguyên)
     private void setAllButtonsEnabled(boolean enabled) {
-        // ... (Giữ nguyên code) ...
         if (javax.swing.SwingUtilities.isEventDispatchThread()) {
             btnLoadKH.setEnabled(enabled);
             btnAddKH.setEnabled(enabled);
@@ -446,11 +442,12 @@ public class KhachHang extends javax.swing.JPanel {
         }
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration
     private javax.swing.JButton btnAddKH;
     private javax.swing.JButton btnDeleteKH;
     private javax.swing.JButton btnLoadKH;
     private javax.swing.JButton btnUpdateKH;
+    private javax.swing.JComboBox<String> cmbMaCN_KH;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -461,8 +458,4 @@ public class KhachHang extends javax.swing.JPanel {
     private javax.swing.JTable tblKhachHang;
     private javax.swing.JTextField txtMaKH;
     private javax.swing.JTextField txtTenKH;
-    
-    // === SỬA: Khai báo ComboBox ===
-    private javax.swing.JComboBox<String> cmbMaCN_KH;
-    // End of variables declaration//GEN-END:variables
 }

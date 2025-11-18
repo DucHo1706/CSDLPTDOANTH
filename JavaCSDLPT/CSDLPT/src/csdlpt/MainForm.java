@@ -38,7 +38,7 @@ public class MainForm extends JFrame {
 
         // Khởi tạo logic
         dataModel = new DataModel();
-        ipFile = new File("D:\\Netbean\\CSDLPTDOANTH\\IP.txt"); // ⚠️ Cập nhật đường dẫn IP nếu cần
+        ipFile = new File("E:\\CSDLPT_DOAN(LT)\\IP.txt"); // ⚠️ Cập nhật đường dẫn IP nếu cần
 
         // Khởi tạo giao diện
         initUI();

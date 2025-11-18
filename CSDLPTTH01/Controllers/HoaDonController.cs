@@ -1,6 +1,6 @@
 ﻿using CSDLPTTH01.Models;
 using System;
-using System.Data; // Thêm thư viện này
+using System.Data;
 using System.Data.SqlClient;
 using System.Web.Mvc;
 
@@ -9,6 +9,7 @@ namespace CSDLPTTH01.Controllers
     public class HoaDonController : Controller
     {
         DataModel db = new DataModel();
+
         public JsonResult Index()
         {
             try
@@ -22,35 +23,35 @@ namespace CSDLPTTH01.Controllers
             }
         }
 
-        // === SỬA TOÀN BỘ ===
-        [HttpPost]
-        // 1. Đổi 'double soTien' -> 'decimal soTien' (khớp với CSDL)
-        public JsonResult Add(int thang, int nam, string soHD, string maNV, decimal soTien)
+        [HttpPost]
+        public JsonResult Add(string soHDN, int thang, int nam, string soHD, string maNV, decimal soTien)
         {
             try
             {
-                // 2. Sửa SQL để gọi Stored Procedure
-                string sql = "EXEC sp_TaoHoaDonTuDong @thang, @nam, @soHD, @maNV, @soTien, @SoHDNMoi_Output = @SoHDNMoi OUTPUT";
+                // Sử dụng INSERT INTO với số hóa đơn được truyền từ client
+                string sql = "INSERT INTO HOADON (soHDN, thang, nam, soHD, maNV, soTien) VALUES (@soHDN, @thang, @nam, @soHD, @maNV, @soTien)";
 
                 SqlParameter[] parameters = {
-          new SqlParameter("@thang", thang),
-          new SqlParameter("@nam", nam),
-                    new SqlParameter("@soHD", SqlDbType.Char, 15) { Value = soHD }, // Thêm Size
-                    new SqlParameter("@maNV", SqlDbType.Char, 15) { Value = maNV }, // Thêm Size
-                    new SqlParameter("@soTien", soTien),
-                    // 3. Thêm tham số Output (15 KÝ TỰ)
-                    new SqlParameter("@SoHDNMoi", SqlDbType.Char, 15) { Direction = ParameterDirection.Output }
-        };
+                    new SqlParameter("@soHDN", SqlDbType.Char, 15) { Value = soHDN },
+                    new SqlParameter("@thang", thang),
+                    new SqlParameter("@nam", nam),
+                    new SqlParameter("@soHD", SqlDbType.Char, 15) { Value = soHD },
+                    new SqlParameter("@maNV", SqlDbType.Char, 15) { Value = maNV },
+                    new SqlParameter("@soTien", soTien)
+                };
 
                 db.exec(sql, parameters);
-                return Json(new { success = true, message = "Thêm hóa đơn thành công (Mã đã được tạo tự động)!" });
+                return Json(new { success = true, message = "Thêm hóa đơn thành công!" });
             }
             catch (SqlException ex)
             {
-                // 4. Thêm bắt lỗi 50000 (RAISERROR từ SP)
-                if (ex.Number == 50000)
+                if (ex.Number == 50000)
                 {
                     return Json(new { success = false, message = "Lỗi logic: " + ex.Message });
+                }
+                if (ex.Number == 2627 || ex.Number == 2601)
+                {
+                    return Json(new { success = false, message = "Lỗi: Số hóa đơn này đã tồn tại." });
                 }
                 if (ex.Number == 547)
                 {
@@ -65,9 +66,7 @@ namespace CSDLPTTH01.Controllers
         }
 
         [HttpPost]
-        // 5. Sửa 'int soHDN' -> 'string soHDN'
-        // 6. Sửa 'double soTien' -> 'decimal soTien'
-        public JsonResult Update(string soHDN, int thang, int nam, string soHD, string maNV, decimal soTien)
+        public JsonResult Update(string soHDN, int thang, int nam, string soHD, string maNV, decimal soTien)
         {
             try
             {
@@ -76,13 +75,13 @@ namespace CSDLPTTH01.Controllers
                       "WHERE soHDN=@soHDN";
 
                 SqlParameter[] parameters = {
-          new SqlParameter("@thang", thang),
-          new SqlParameter("@nam", nam),
-                    new SqlParameter("@soHD", SqlDbType.Char, 15) { Value = soHD }, // Thêm Size
-                    new SqlParameter("@maNV", SqlDbType.Char, 15) { Value = maNV }, // Thêm Size
-                    new SqlParameter("@soTien", soTien),
-                    new SqlParameter("@soHDN", SqlDbType.Char, 15) { Value = soHDN } // Thêm Size
-                };
+                    new SqlParameter("@thang", thang),
+                    new SqlParameter("@nam", nam),
+                    new SqlParameter("@soHD", SqlDbType.Char, 15) { Value = soHD },
+                    new SqlParameter("@maNV", SqlDbType.Char, 15) { Value = maNV },
+                    new SqlParameter("@soTien", soTien),
+                    new SqlParameter("@soHDN", SqlDbType.Char, 15) { Value = soHDN }
+                };
 
                 db.exec(sql, parameters);
                 return Json(new { success = true, message = "Cập nhật hóa đơn thành công!" });
@@ -102,23 +101,30 @@ namespace CSDLPTTH01.Controllers
         }
 
         [HttpPost]
-        // 7. Sửa 'int soHDN' -> 'string soHDN'
-        public JsonResult Delete(string soHDN)
+        public JsonResult Delete(string soHDN)
         {
             try
             {
                 string sql = "DELETE FROM HOADON WHERE soHDN=@soHDN";
 
                 SqlParameter[] parameters = {
-                    new SqlParameter("@soHDN", SqlDbType.Char, 15) { Value = soHDN } // Thêm Size
-                };
+                    new SqlParameter("@soHDN", SqlDbType.Char, 15) { Value = soHDN }
+                };
 
                 db.exec(sql, parameters);
                 return Json(new { success = true, message = "Xóa hóa đơn thành công!" });
             }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 547)
+                {
+                    return Json(new { success = false, message = "Không thể xóa hóa đơn do có dữ liệu liên quan." });
+                }
+                return Json(new { success = false, message = "Lỗi SQL: " + ex.Message });
+            }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Lỗi: " + ex.Message });
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
             }
         }
     }

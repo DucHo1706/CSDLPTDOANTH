@@ -1,6 +1,6 @@
 ﻿using CSDLPTTH01.Models;
 using System;
-using System.Data; // Thêm thư viện này
+using System.Data;
 using System.Data.SqlClient;
 using System.Web.Mvc;
 
@@ -24,21 +24,20 @@ namespace CSDLPTTH01.Controllers
         }
 
         [HttpPost]
-        public JsonResult Add(string tenCN, string thanhpho)
+        public JsonResult Add(string maCN, string tenCN, string thanhpho)
         {
             try
             {
-                string sql = "EXEC sp_TaoChiNhanhTuDong @tenCN, @thanhpho, @MaCNMoi_Output = @MaCNMoi OUTPUT";
+                 string sql = "INSERT INTO chinhanh (maCN, tenCN, thanhpho) VALUES (@maCN, @tenCN, @thanhpho)";
 
                 SqlParameter[] parameters = {
-          new SqlParameter("@tenCN", tenCN),
-          new SqlParameter("@thanhpho", thanhpho),
-                    // === SỬA (10 -> 15) ===
-                    new SqlParameter("@MaCNMoi", SqlDbType.Char, 15) { Direction = ParameterDirection.Output }
-        };
+                    new SqlParameter("@maCN", SqlDbType.Char, 15) { Value = maCN },
+                    new SqlParameter("@tenCN", tenCN),
+                    new SqlParameter("@thanhpho", thanhpho)
+                };
 
                 db.exec(sql, parameters);
-                return Json(new { success = true, message = "Thêm chi nhánh thành công (Mã đã được tạo tự động)!" });
+                return Json(new { success = true, message = "Thêm chi nhánh thành công!" });
             }
             catch (SqlException ex)
             {
@@ -66,11 +65,10 @@ namespace CSDLPTTH01.Controllers
                 string sql = "UPDATE chinhanh SET tenCN=@tenCN, thanhpho=@thanhpho WHERE maCN=@maCN";
 
                 SqlParameter[] parameters = {
-          new SqlParameter("@tenCN", tenCN),
-          new SqlParameter("@thanhpho", thanhpho),
-                    // === SỬA (Thêm Size) ===
-                    new SqlParameter("@maCN", SqlDbType.Char, 15) { Value = maCN }
-        };
+                    new SqlParameter("@tenCN", tenCN),
+                    new SqlParameter("@thanhpho", thanhpho),
+                    new SqlParameter("@maCN", SqlDbType.Char, 15) { Value = maCN }
+                };
 
                 db.exec(sql, parameters);
                 return Json(new { success = true, message = "Cập nhật chi nhánh thành công!" });
@@ -89,9 +87,8 @@ namespace CSDLPTTH01.Controllers
                 string sql = "DELETE FROM chinhanh WHERE maCN=@maCN";
 
                 SqlParameter[] parameters = {
-                    // === SỬA (Thêm Size) ===
-                    new SqlParameter("@maCN", SqlDbType.Char, 15) { Value = maCN }
-        };
+                    new SqlParameter("@maCN", SqlDbType.Char, 15) { Value = maCN }
+                };
 
                 db.exec(sql, parameters);
                 return Json(new { success = true, message = "Xóa chi nhánh thành công!" });

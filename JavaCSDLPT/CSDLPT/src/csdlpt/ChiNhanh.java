@@ -32,7 +32,6 @@ public class ChiNhanh extends javax.swing.JPanel {
     private final Color BACKGROUND_COLOR = new Color(245, 245, 245);
     private final Color PANEL_BACKGROUND = Color.WHITE;
     private final Color BORDER_COLOR = new Color(189, 195, 199);
-    private final Color DISABLED_BACKGROUND = new Color(240, 240, 240); 
 
     /**
      * Creates new form ChiNhanhPanel
@@ -63,8 +62,14 @@ public class ChiNhanh extends javax.swing.JPanel {
         });
     }
 
+    // Hàm reset form
+    private void resetForm() {
+        txtMaCN.setText("");
+        txtTenCN.setText("");
+        txtThanhPho.setText("");
+    }
+
     private void applyModernStyling() {
-        // ... (Giữ nguyên code) ...
         setBackground(BACKGROUND_COLOR);
         panelForm.setBackground(PANEL_BACKGROUND);
         panelButtons.setBackground(PANEL_BACKGROUND);
@@ -92,9 +97,6 @@ public class ChiNhanh extends javax.swing.JPanel {
         txtMaCN.setBorder(textFieldBorder);
         txtTenCN.setBorder(textFieldBorder);
         txtThanhPho.setBorder(textFieldBorder);
-
-        txtMaCN.setBackground(DISABLED_BACKGROUND);
-        txtMaCN.setForeground(new Color(100, 100, 100));
 
         styleButton(btnLoadCN, new Color(52, 152, 219));
         styleButton(btnAddCN, new Color(39, 174, 96));
@@ -137,7 +139,6 @@ public class ChiNhanh extends javax.swing.JPanel {
     }
 
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
@@ -170,10 +171,7 @@ public class ChiNhanh extends javax.swing.JPanel {
             new java.awt.Color(41, 128, 185)
         ));
 
-        jLabel1.setText("Mã Chi Nhánh (Auto):"); // Sửa Text
-        txtMaCN.setEditable(false); // Sửa: Thêm dòng này
-        txtMaCN.setFocusable(false); // Sửa: Thêm dòng này
-        
+        jLabel1.setText("Mã Chi Nhánh:"); // Đã sửa: bỏ "(Auto)"
         jLabel2.setText("Tên Chi Nhánh:");
         jLabel3.setText("Thành Phố:");
 
@@ -211,7 +209,6 @@ public class ChiNhanh extends javax.swing.JPanel {
         });
         panelButtons.add(btnDeleteCN);
 
-        // (Layout giữ nguyên, không cần ComboBox)
         javax.swing.GroupLayout panelFormLayout = new javax.swing.GroupLayout(panelForm);
         panelForm.setLayout(panelFormLayout);
         panelFormLayout.setHorizontalGroup(
@@ -254,7 +251,6 @@ public class ChiNhanh extends javax.swing.JPanel {
 
         jSplitPane1.setLeftComponent(panelForm);
 
-        // (Model Bảng giữ nguyên)
         tblChiNhanh.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -283,10 +279,9 @@ public class ChiNhanh extends javax.swing.JPanel {
         jSplitPane1.setRightComponent(jScrollPane1);
 
         add(jSplitPane1, java.awt.BorderLayout.CENTER);
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
-    // (Hàm btnLoadCNActionPerformed giữ nguyên)
-    private void btnLoadCNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadCNActionPerformed
+    private void btnLoadCNActionPerformed(java.awt.event.ActionEvent evt) {
         String endpoint = "/CHINHANH/Index";
         txtLogOutput.setText("Đang tải dữ liệu Chi Nhánh từ tất cả các site...\n");
         
@@ -297,46 +292,62 @@ public class ChiNhanh extends javax.swing.JPanel {
                 setAllButtonsEnabled(true);
             });
         }).start();
-    }//GEN-LAST:event_btnLoadCNActionPerformed
-    private void btnAddCNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddCNActionPerformed
+    }
+
+    private void btnAddCNActionPerformed(java.awt.event.ActionEvent evt) {
         String endpoint = "/CHINHANH/Add";
         
         Map<String, String> params = new HashMap<>();
-        // Không gửi maCN (SP sẽ tự tạo)
-        params.put("tenCN", txtTenCN.getText());
-        params.put("thanhpho", txtThanhPho.getText());
+        // Gửi mã chi nhánh do người dùng nhập
+        params.put("maCN", txtMaCN.getText().trim());
+        params.put("tenCN", txtTenCN.getText().trim());
+        params.put("thanhpho", txtThanhPho.getText().trim());
 
-        if (params.get("tenCN").isEmpty() || params.get("thanhpho").isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập Tên CN và Thành Phố.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        // Kiểm tra dữ liệu đầu vào
+        if (params.get("maCN").isEmpty() || params.get("tenCN").isEmpty() || params.get("thanhpho").isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin: Mã CN, Tên CN và Thành Phố.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Validate mã chi nhánh
+        if (!params.get("maCN").matches("^[a-zA-Z0-9]+$")) {
+            JOptionPane.showMessageDialog(this, "Mã chi nhánh chỉ được chứa chữ cái và số.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         txtLogOutput.setText("Đang gửi lệnh THÊM Chi Nhánh đến MÁY CHÍNH...\n");
+        txtLogOutput.append("Mã CN: " + params.get("maCN") + "\n");
+        txtLogOutput.append("Tên CN: " + params.get("tenCN") + "\n");
+        txtLogOutput.append("Thành Phố: " + params.get("thanhpho") + "\n");
         
         new Thread(() -> {
             setAllButtonsEnabled(false);
-            // Gọi API (API sẽ gọi sp_TaoChiNhanhTuDong)
+            // Gọi API với mã chi nhánh do người dùng nhập
             boolean isSuccess = dataModel.postToMaster(txtLogOutput, params, endpoint);
             
             if(isSuccess) {
-                txtLogOutput.append("\nĐang tải lại dữ liệu (chờ Replication)...");
+                txtLogOutput.append("\n✅ THÊM THÀNH CÔNG! Đang tải lại dữ liệu...");
                 try { Thread.sleep(2000); } catch (Exception e) {}
                 btnLoadCNActionPerformed(null);
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    resetForm(); // Reset form sau khi thêm thành công
+                });
             } else {
-                txtLogOutput.append("\n==> THÊM THẤT BẠI. Dữ liệu sẽ không được tải lại.");
+                txtLogOutput.append("\n❌ THÊM THẤT BẠI.");
                 javax.swing.SwingUtilities.invokeLater(() -> {
                     setAllButtonsEnabled(true);
                 });
             }
         }).start();
-    }//GEN-LAST:event_btnAddCNActionPerformed
-    private void btnUpdateCNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateCNActionPerformed
+    }
+
+    private void btnUpdateCNActionPerformed(java.awt.event.ActionEvent evt) {
         String endpoint = "/CHINHANH/Update";
         
         Map<String, String> params = new HashMap<>();
-        params.put("maCN", txtMaCN.getText());
-        params.put("tenCN", txtTenCN.getText());
-        params.put("thanhpho", txtThanhPho.getText());
+        params.put("maCN", txtMaCN.getText().trim());
+        params.put("tenCN", txtTenCN.getText().trim());
+        params.put("thanhpho", txtThanhPho.getText().trim());
 
         if (params.get("maCN").isEmpty()) {
             JOptionPane.showMessageDialog(this, "Bạn phải chọn một Chi Nhánh (Mã CN) để sửa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -360,12 +371,13 @@ public class ChiNhanh extends javax.swing.JPanel {
                 });
             }
         }).start();
-    }//GEN-LAST:event_btnUpdateCNActionPerformed
-    private void btnDeleteCNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteCNActionPerformed
+    }
+
+    private void btnDeleteCNActionPerformed(java.awt.event.ActionEvent evt) {
         String endpoint = "/CHINHANH/Delete";
         
         Map<String, String> params = new HashMap<>();
-        params.put("maCN", txtMaCN.getText());
+        params.put("maCN", txtMaCN.getText().trim());
 
         if (params.get("maCN").isEmpty()) {
             JOptionPane.showMessageDialog(this, "Bạn phải chọn một Chi Nhánh (Mã CN) để xóa.", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -391,6 +403,9 @@ public class ChiNhanh extends javax.swing.JPanel {
                 txtLogOutput.append("\nĐang tải lại dữ liệu (chờ Replication)...");
                 try { Thread.sleep(2000); } catch (Exception e) {}
                 btnLoadCNActionPerformed(null);
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    resetForm(); // Reset form sau khi xóa thành công
+                });
             } else {
                 txtLogOutput.append("\n==> XÓA THẤT BẠI. Dữ liệu sẽ không được tải lại.");
                 javax.swing.SwingUtilities.invokeLater(() -> {
@@ -398,7 +413,8 @@ public class ChiNhanh extends javax.swing.JPanel {
                 });
             }
         }).start();
-    }//GEN-LAST:event_btnDeleteCNActionPerformed
+    }
+
     private void setAllButtonsEnabled(boolean enabled) {
         if (javax.swing.SwingUtilities.isEventDispatchThread()) {
             btnLoadCN.setEnabled(enabled);
@@ -414,6 +430,8 @@ public class ChiNhanh extends javax.swing.JPanel {
             });
         }
     }
+
+    // Variables declaration
     private javax.swing.JButton btnAddCN;
     private javax.swing.JButton btnDeleteCN;
     private javax.swing.JButton btnLoadCN;

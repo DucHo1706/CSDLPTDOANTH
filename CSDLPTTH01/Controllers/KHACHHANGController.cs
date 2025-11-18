@@ -1,6 +1,6 @@
 ﻿using CSDLPTTH01.Models;
 using System;
-using System.Data; // Thêm thư viện này
+using System.Data;
 using System.Data.SqlClient;
 using System.Web.Mvc;
 
@@ -24,21 +24,21 @@ namespace CSDLPTTH01.Controllers
         }
 
         [HttpPost]
-        public JsonResult Add(string tenKH, string maCN)
+        public JsonResult Add(string maKH, string tenKH, string maCN)
         {
             try
             {
-                string sql = "EXEC sp_TaoKhachHangTuDong @tenKH, @maCN, @MaKHMoi_Output = @MaKHMoi OUTPUT";
+                // Sử dụng INSERT INTO với mã khách hàng được truyền từ client
+                string sql = "INSERT INTO KHACHHANG (maKH, tenKH, maCN) VALUES (@maKH, @tenKH, @maCN)";
 
                 SqlParameter[] parameters = {
-          new SqlParameter("@tenKH", tenKH),
-                    new SqlParameter("@maCN", SqlDbType.Char, 15) { Value = maCN }, // Thêm Size
-                    // === SỬA (10 -> 15) ===
-                    new SqlParameter("@MaKHMoi", SqlDbType.Char, 15) { Direction = ParameterDirection.Output }
-        };
+                    new SqlParameter("@maKH", SqlDbType.Char, 15) { Value = maKH },
+                    new SqlParameter("@tenKH", tenKH),
+                    new SqlParameter("@maCN", SqlDbType.Char, 15) { Value = maCN }
+                };
 
                 db.exec(sql, parameters);
-                return Json(new { success = true, message = "Thêm khách hàng thành công (Mã đã được tạo tự động)!" });
+                return Json(new { success = true, message = "Thêm khách hàng thành công!" });
             }
             catch (SqlException ex)
             {
@@ -70,10 +70,10 @@ namespace CSDLPTTH01.Controllers
                 string sql = "UPDATE KHACHHANG SET tenKH=@tenKH, maCN=@maCN WHERE maKH=@maKH";
 
                 SqlParameter[] parameters = {
-          new SqlParameter("@tenKH", tenKH),
-                    new SqlParameter("@maCN", SqlDbType.Char, 15) { Value = maCN }, // Thêm Size
-                    new SqlParameter("@maKH", SqlDbType.Char, 15) { Value = maKH } // Thêm Size
-                };
+                    new SqlParameter("@tenKH", tenKH),
+                    new SqlParameter("@maCN", SqlDbType.Char, 15) { Value = maCN },
+                    new SqlParameter("@maKH", SqlDbType.Char, 15) { Value = maKH }
+                };
 
                 db.exec(sql, parameters);
                 return Json(new { success = true, message = "Cập nhật khách hàng thành công!" });
@@ -100,8 +100,8 @@ namespace CSDLPTTH01.Controllers
                 string sql = "DELETE FROM KHACHHANG WHERE maKH=@maKH";
 
                 SqlParameter[] parameters = {
-                    new SqlParameter("@maKH", SqlDbType.Char, 15) { Value = maKH } // Thêm Size
-                };
+                    new SqlParameter("@maKH", SqlDbType.Char, 15) { Value = maKH }
+                };
 
                 db.exec(sql, parameters);
                 return Json(new { success = true, message = "Xóa khách hàng thành công!" });
@@ -117,7 +117,21 @@ namespace CSDLPTTH01.Controllers
             catch (Exception ex)
             {
                 return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
-                }
+            }
+        }
+
+        // Thêm action để lấy danh sách chi nhánh (nếu cần cho dropdown)
+        public JsonResult GetChiNhanh()
+        {
+            try
+            {
+                string sql = "SELECT maCN, tenCN FROM CHINHANH";
+                return Json(db.get(sql), JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi khi tải danh sách chi nhánh: " + ex.Message });
+            }
         }
     }
 }
